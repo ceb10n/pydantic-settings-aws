@@ -11,7 +11,7 @@ from pydantic_settings_aws import aws
 
 class SecretsManagerSettingsSource(PydanticBaseSettingsSource):
 
-    def __init__(self, settings_cls: BaseSettings):
+    def __init__(self, settings_cls: type[BaseSettings]):
         super().__init__(settings_cls)
         self._json_content = aws.get_secrets_content(settings_cls)
 
@@ -43,11 +43,11 @@ class SecretsManagerBaseSettings(BaseSettings):
     def settings_customise_sources(
         cls,
         settings_cls: type[BaseSettings],
-        init_settings,
-        env_settings,
-        dotenv_settings,
-        file_secret_settings,
-    ):
+        init_settings: PydanticBaseSettingsSource,
+        env_settings: PydanticBaseSettingsSource,
+        dotenv_settings: PydanticBaseSettingsSource,
+        file_secret_settings: PydanticBaseSettingsSource,
+    ) -> tuple[PydanticBaseSettingsSource, ...]:
         return (
             init_settings,
             SecretsManagerSettingsSource(settings_cls),

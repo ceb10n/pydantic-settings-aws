@@ -11,7 +11,7 @@ from .logger import logger
 from .models import AwsSecretsArgs, AwsSession
 
 
-def create_secrets_client(settings: BaseSettings) -> SecretsManagerClient:
+def create_secrets_client(settings: type[BaseSettings]) -> SecretsManagerClient:
     """Create a boto3 client for secrets manager.
 
     Neither `boto3` nor `pydantic` exceptions will be handled.
@@ -34,7 +34,7 @@ def create_secrets_client(settings: BaseSettings) -> SecretsManagerClient:
     return session.client("secretsmanager")
 
 
-def get_secrets_content(settings: BaseSettings) -> dict[str, Any]:
+def get_secrets_content(settings: type[BaseSettings]) -> dict[str, Any]:
     client: SecretsManagerClient | None = settings.model_config.get(
         "secrets_client",
         None
