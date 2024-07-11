@@ -1,6 +1,6 @@
 from .main import SecretsManagerBaseSettings
 from .version import VERSION
 
-__all__ = [ SecretsManagerBaseSettings ]
+__all__ = [ "SecretsManagerBaseSettings" ]
 
 __version__ = VERSION

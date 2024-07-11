@@ -23,7 +23,7 @@ def create_secrets_client(settings: BaseSettings) -> SecretsManagerClient:
         SecretsManagerClient: A secrets manager boto3 client.
     """
     logger.debug("Extracting settings prefixed with aws_")
-    args = {k: v for k, v in settings.model_config.items() if k.startswith("aws_") }
+    args: dict[str, Any] = {k: v for k, v in settings.model_config.items() if k.startswith("aws_") }
     
     session_args = AwsSession(**args)
     
@@ -45,7 +45,7 @@ def get_secrets_content(settings: BaseSettings) -> dict[str, Any]:
         client = create_secrets_client(settings)
 
     logger.debug("Extracting settings prefixed with secrets_, except _client and _dir")
-    args = {k: v for k, v in settings.model_config.items() if k.startswith("secrets_") and k not in ("secrets_client", "secrets_dir")}
+    args: dict[str, Any] = {k: v for k, v in settings.model_config.items() if k.startswith("secrets_") and k not in ("secrets_client", "secrets_dir")}
 
     try:
         secrets_args = AwsSecretsArgs(**args)
@@ -69,7 +69,13 @@ def get_secrets_content(settings: BaseSettings) -> dict[str, Any]:
         secrets_content = secret_value_response.get("SecretString")
 
     elif "SecretBinary" in secret_value_response:
-        secrets_content = secret_value_response.get("SecretBinary").decode("utf-8")
+        secret_binary: bytes | None = secret_value_response.get("SecretBinary")
+
+        if secret_binary:
+            secrets_content = secret_binary.decode("utf-8")
+
+    if not secrets_content:
+        raise ValueError("Could not get secrets content")
 
     try:
         return json.loads(secrets_content)
