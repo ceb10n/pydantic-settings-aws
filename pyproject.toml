@@ -74,13 +74,10 @@ source = [
 line-length = 80
 target-version = 'py39'
 
-[tool.ruff.lint.pyupgrade]
-keep-runtime-typing = true
-
 [tool.ruff.lint]
 extend-select = ['Q', 'RUF100', 'C90', 'UP', 'I']
-flake8-quotes = {inline-quotes = 'single', multiline-quotes = 'double'}
-isort = { known-first-party = ['pydantic_settings', 'tests'] }
+flake8-quotes = {inline-quotes = 'double', multiline-quotes = 'double'}
+isort = { known-first-party = ['pydantic_settings_aws', 'tests'] }
 mccabe = { max-complexity = 14 }
 pydocstyle = { convention = 'google' }
 

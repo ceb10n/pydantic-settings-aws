@@ -1,4 +1,5 @@
 from pydantic_settings import SettingsConfigDict
+
 from pydantic_settings_aws.main import SecretsManagerBaseSettings
 
 from .boto3_mocks import ClientMock
