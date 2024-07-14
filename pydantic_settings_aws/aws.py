@@ -12,7 +12,7 @@ from .models import AwsSecretsArgs, AwsSession
 
 
 def get_secrets_content(settings: type[BaseSettings]) -> dict[str, Any]:
-    client: SecretsManagerClient | None = _get_boto3_client(settings)
+    client: SecretsManagerClient = _get_boto3_client(settings)
     secrets_args: AwsSecretsArgs = _get_secrets_args(settings)
 
     logger.debug("Getting secrets manager value with boto3 client")
@@ -98,7 +98,9 @@ def _get_secrets_args(settings: type[BaseSettings]) -> AwsSecretsArgs:
         raise err
 
 
-def _get_secrets_content(secret: dict[str, Any]) -> Optional[str]:
+def _get_secrets_content(
+    secret: GetSecretValueResponseTypeDef,
+) -> Optional[str]:
     secrets_content: Optional[str] = None
 
     if "SecretString" in secret and secret.get("SecretString"):

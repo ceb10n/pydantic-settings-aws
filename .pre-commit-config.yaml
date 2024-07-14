@@ -1,0 +1,24 @@
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.3.0
+  hooks:
+  - id: check-yaml
+    args: ['--unsafe']
+  - id: check-toml
+  - id: end-of-file-fixer
+  - id: trailing-whitespace
+
+- repo: local
+  hooks:
+  - id: lint
+    name: Lint
+    entry: ruff check pydantic_settings_aws
+    types: [python]
+    language: system
+    pass_filenames: false
+  - id: mypy
+    name: Mypy
+    entry: mypy pydantic_settings_aws
+    types: [python]
+    language: system
+    pass_filenames: false

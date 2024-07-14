@@ -9,6 +9,23 @@ on:
   pull_request: {}
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4
+
+    - name: set up python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: install deps
+      run: pip install -r requirements-test.txt
+
+    - uses: pre-commit/action@v3.0.1
+      with:
+        extra_args: --all-files
   test:
     name: test py${{ matrix.python }} on ${{ matrix.os }}
     strategy:
