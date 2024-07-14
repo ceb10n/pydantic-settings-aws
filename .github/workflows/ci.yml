@@ -31,7 +31,7 @@ jobs:
       with:
         python-version: ${{ matrix.python }}
 
-    - run: pip install -r requirements-dev.txt
+    - run: pip install -r requirements-test.txt
 
     - name: test
       run: pytest --cov=pydantic_settings_aws --cov-report=xml
