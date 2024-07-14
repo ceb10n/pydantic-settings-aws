@@ -2,8 +2,8 @@ import json
 from unittest import mock
 
 import pytest
-
 from pydantic import ValidationError
+
 from pydantic_settings_aws import aws
 
 from .aws_mocks import (
