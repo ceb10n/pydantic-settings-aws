@@ -18,8 +18,8 @@ env3.*
 env
 docs_build
 site_build
-venv
-.venv
+venv*
+.venv*
 docs.zip
 archive.zip
 pytest.log

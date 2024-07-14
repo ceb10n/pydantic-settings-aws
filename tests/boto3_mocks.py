@@ -19,5 +19,5 @@ class ClientMock:
             "VersionStages": [
                 "string",
             ],
-            "CreatedDate": datetime.datetime.now(datetime.UTC)
+            "CreatedDate": datetime.datetime.utcnow()
         }
