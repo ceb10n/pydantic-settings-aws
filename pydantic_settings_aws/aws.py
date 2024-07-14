@@ -1,5 +1,5 @@
 import json
-from typing import Any
+from typing import Any, Optional
 
 import boto3
 from mypy_boto3_secretsmanager import SecretsManagerClient
@@ -11,7 +11,48 @@ from .logger import logger
 from .models import AwsSecretsArgs, AwsSession
 
 
-def create_secrets_client(settings: type[BaseSettings]) -> SecretsManagerClient:
+def get_secrets_content(settings: type[BaseSettings]) -> dict[str, Any]:
+    client: SecretsManagerClient | None = _get_boto3_client(settings)
+    secrets_args: AwsSecretsArgs = _get_secrets_args(settings)
+
+    logger.debug("Getting secrets manager value with boto3 client")
+    secret_response: GetSecretValueResponseTypeDef = client.get_secret_value(
+        **secrets_args.model_dump(by_alias=True, exclude_none=True)
+    )
+
+    secrets_content = _get_secrets_content(secret_response)
+
+    if not secrets_content:
+        logger.warning(
+            "Secrets content was not present neither in SecretString nor SecretBinary"
+        )
+        raise ValueError("Could not get secrets content")
+
+    try:
+        return json.loads(secrets_content)
+    except json.decoder.JSONDecodeError as json_err:
+        logger.error(
+            f"The content of the secrets manager must be a valid json: {json_err}"
+        )
+        raise json_err
+
+
+def _get_boto3_client(settings: type[BaseSettings]) -> SecretsManagerClient:
+    logger.debug("Getting secrets manager content.")
+    client: SecretsManagerClient | None = settings.model_config.get(  # type: ignore
+        "secrets_client", None
+    )
+
+    if client:
+        return client
+
+    logger.debug("No boto3 client was informed. Will try to create a new one")
+    return _create_secrets_client(settings)
+
+
+def _create_secrets_client(
+    settings: type[BaseSettings],
+) -> SecretsManagerClient:
     """Create a boto3 client for secrets manager.
 
     Neither `boto3` nor `pydantic` exceptions will be handled.
@@ -36,18 +77,7 @@ def create_secrets_client(settings: type[BaseSettings]) -> SecretsManagerClient:
     return session.client("secretsmanager")
 
 
-def get_secrets_content(settings: type[BaseSettings]) -> dict[str, Any]:
-    logger.debug("Getting secrets manager content.")
-    client: SecretsManagerClient | None = settings.model_config.get(  # type: ignore
-        "secrets_client", None
-    )
-
-    if not client:
-        logger.debug(
-            "No boto3 client was informed. Will try to create a new one"
-        )
-        client = create_secrets_client(settings)
-
+def _get_secrets_args(settings: type[BaseSettings]) -> AwsSecretsArgs:
     logger.debug(
         "Extracting settings prefixed with secrets_, except _client and _dir"
     )
@@ -59,7 +89,7 @@ def get_secrets_content(settings: type[BaseSettings]) -> dict[str, Any]:
     }
 
     try:
-        secrets_args = AwsSecretsArgs(**args)
+        return AwsSecretsArgs(**args)
 
     except ValidationError as err:
         logger.error(
@@ -67,33 +97,19 @@ def get_secrets_content(settings: type[BaseSettings]) -> dict[str, Any]:
         )
         raise err
 
-    try:
-        logger.debug("Getting secrets manager value with boto3 client")
-        secret_value_response: GetSecretValueResponseTypeDef = (
-            client.get_secret_value(
-                **secrets_args.model_dump(by_alias=True, exclude_none=True)
-            )
-        )
-    except client.exceptions.ResourceNotFoundException as resource_nf_err:
-        logger.error(
-            f"The secrets manager with name {secrets_args.secrets_name} does not exist: {resource_nf_err}"
-        )
 
-        raise resource_nf_err
+def _get_secrets_content(secret: dict[str, Any]) -> Optional[str]:
+    secrets_content: Optional[str] = None
 
-    secrets_content: str | None = None
-
-    if "SecretString" in secret_value_response and secret_value_response.get(
-        "SecretString"
-    ):
+    if "SecretString" in secret and secret.get("SecretString"):
         logger.debug("Extracting content from SecretString.")
-        secrets_content = secret_value_response.get("SecretString")
+        secrets_content = secret.get("SecretString")
 
-    elif "SecretBinary" in secret_value_response:
+    elif "SecretBinary" in secret:
         logger.debug(
             "SecretString was not present. Getting content from SecretBinary."
         )
-        secret_binary: bytes | None = secret_value_response.get("SecretBinary")
+        secret_binary: bytes | None = secret.get("SecretBinary")
 
         if secret_binary:
             try:
@@ -103,16 +119,4 @@ def get_secrets_content(settings: type[BaseSettings]) -> dict[str, Any]:
 
                 raise val_err
 
-    if not secrets_content:
-        logger.warning(
-            "Secrets content was not present neither in SecretString nor SecretBinary"
-        )
-        raise ValueError("Could not get secrets content")
-
-    try:
-        return json.loads(secrets_content)
-    except json.decoder.JSONDecodeError as json_err:
-        logger.error(
-            f"The content of the secrets manager must be a valid json: {json_err}"
-        )
-        raise json_err
+    return secrets_content
