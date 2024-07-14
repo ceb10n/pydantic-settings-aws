@@ -51,8 +51,16 @@ jobs:
     - run: pip install -r requirements-test.txt
 
     - name: test
-      run: pytest --cov=pydantic_settings_aws --cov-report=xml
+      run: coverage run -m pytest --durations=10
+      env:
+        COVERAGE_FILE: .coverage.${{ runner.os }}-py${{ matrix.python }}-without-dotenv
+        CONTEXT: ${{ runner.os }}-py${{ matrix.python }}-without-dotenv
+
+    - run: coverage combine
+    - run: coverage xml
 
     - uses: codecov/codecov-action@v4.0.1
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
+        file: ./coverage.xml
+        env_vars: PYTHON,OS
