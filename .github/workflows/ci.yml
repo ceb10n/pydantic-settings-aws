@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - '**'
+  pull_request: {}
+
+jobs:
+  test:
+    name: test py${{ matrix.python }} on ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python: ['3.9', '3.10', '3.11', '3.12']
+
+    env:
+      PYTHON: ${{ matrix.python }}
+      OS: ${{ matrix.os }}
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: set up python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python }}
+
+    - run: pip install -r requirements-dev.txt
+
+    - name: test
+      run: pytest --cov=pydantic_settings_aws --cov-report=xml
+
+    - uses: codecov/codecov-action@v4.0.1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}

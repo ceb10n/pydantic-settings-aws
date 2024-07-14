@@ -1,26 +1,20 @@
-from pydantic_settings import SettingsConfigDict
-
-from pydantic_settings_aws.main import SecretsManagerBaseSettings
-
-from .boto3_mocks import ClientMock
-
-secrets_with_username_and_password = '{ "username": "myusername", "password": "password1234" }'
-
-mock_secrets_with_username_and_pwd = ClientMock(secret_string=secrets_with_username_and_password)
+from .settings_mocks import (
+    MySecretsWithClientConfig,
+    SecretsWithNestedContent,
+)
 
 
-class MySecretsWithClientConfig(SecretsManagerBaseSettings):
-    model_config = SettingsConfigDict(
-        secrets_name="my/secret",
-        secrets_client=mock_secrets_with_username_and_pwd
-    )
-
-    username: str
-    password: str
-
-
-
-def test():
+def test_secrets_settings_with_basic_secrets_content():
     my_config = MySecretsWithClientConfig()
+
     assert my_config is not None
     assert my_config.username == "myusername"
+
+
+def test_secrets_settings_with_nested_secrets_content():
+    my_config = SecretsWithNestedContent()
+
+    assert my_config is not None
+    assert my_config.username == "myusername"
+    assert my_config.nested is not None
+    assert len(my_config.nested.roles) > 0

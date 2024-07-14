@@ -10,7 +10,6 @@ from pydantic_settings_aws import aws
 
 
 class SecretsManagerSettingsSource(PydanticBaseSettingsSource):
-
     def __init__(self, settings_cls: type[BaseSettings]):
         super().__init__(settings_cls)
         self._json_content = aws.get_secrets_content(settings_cls)
@@ -20,6 +19,15 @@ class SecretsManagerSettingsSource(PydanticBaseSettingsSource):
     ) -> tuple[Any, str, bool]:
         field_value = self._json_content.get(field_name)
         return field_value, field_name, False
+
+    def prepare_field_value(
+        self,
+        field_name: str,
+        field: FieldInfo,
+        value: Any,
+        value_is_complex: bool,
+    ) -> Any:
+        return value
 
     def __call__(self) -> dict[str, Any]:
         d: dict[str, Any] = {}
@@ -35,23 +43,3 @@ class SecretsManagerSettingsSource(PydanticBaseSettingsSource):
                 d[field_key] = field_value
 
         return d
-
-
-class SecretsManagerBaseSettings(BaseSettings):
-
-    @classmethod
-    def settings_customise_sources(
-        cls,
-        settings_cls: type[BaseSettings],
-        init_settings: PydanticBaseSettingsSource,
-        env_settings: PydanticBaseSettingsSource,
-        dotenv_settings: PydanticBaseSettingsSource,
-        file_secret_settings: PydanticBaseSettingsSource,
-    ) -> tuple[PydanticBaseSettingsSource, ...]:
-        return (
-            init_settings,
-            SecretsManagerSettingsSource(settings_cls),
-            env_settings,
-            dotenv_settings,
-            file_secret_settings,
-        )
