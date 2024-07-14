@@ -7,7 +7,7 @@
 [![Pydantic v2 only](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/pydantic/pydantic/main/docs/badge/v2.json)](https://docs.pydantic.dev/latest/contributing/#badges)
 [![PyPI - License](https://img.shields.io/pypi/l/pydantic-settings-aws)](https://pypi.org/project/pydantic-settings-aws)
 
-Settings management using Pydantic and Amazon Web Services.
+Settings management using Pydantic and Amazon Web Services / Secrets Manager.
 
 ## 💽 Installation
 
@@ -21,7 +21,7 @@ If you want to leave to pydantic-settings-aws to deal with boto3, you can either
 
 To check how boto3 will look for your configurations, check [Configuring credentials](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html#configuring-credentials).
 
-### With secrets manager client
+### 🧑🏻‍💻 With secrets manager client
 
 ```python
 import boto3
@@ -84,7 +84,6 @@ class AWSSecretsSettings(SecretsManagerBaseSettings):
     password: str
 ```
 
-
 ### 🔒 With AWS IAM Identity Center (SSO)
 
 ```shell
@@ -100,3 +99,7 @@ class AWSSecretsSettings(SecretsManagerBaseSettings):
     username: str
     password: str
 ```
+
+## 👩🏼‍⚖️ License
+
+This project is licensed under the terms of the [MIT license.](LICENSE)
