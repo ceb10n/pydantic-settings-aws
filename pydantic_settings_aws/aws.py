@@ -114,9 +114,9 @@ def _get_secrets_content(secret: dict[str, Any]) -> Optional[str]:
         if secret_binary:
             try:
                 secrets_content = secret_binary.decode("utf-8")
-            except ValueError as val_err:
-                logger.error(f"Error decoding secrets content: {val_err}")
+            except (AttributeError, ValueError) as err:
+                logger.error(f"Error decoding secrets content: {err}")
 
-                raise val_err
+                raise err
 
     return secrets_content

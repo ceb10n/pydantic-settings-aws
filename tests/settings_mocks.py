@@ -1,4 +1,5 @@
 import json
+from typing import Optional
 
 from pydantic import BaseModel
 from pydantic_settings import SettingsConfigDict
@@ -8,7 +9,7 @@ from pydantic_settings_aws import SecretsManagerBaseSettings
 from .boto3_mocks import ClientMock
 
 secrets_with_username_and_password = json.dumps(
-    {"username": "myusername", "password": "password1234"}
+    {"username": "myusername", "password": "password1234", "name": None}
 )
 
 mock_secrets_with_username_and_pwd = ClientMock(
@@ -24,6 +25,7 @@ class MySecretsWithClientConfig(SecretsManagerBaseSettings):
 
     username: str
     password: str
+    name: Optional[str] = None
 
 
 secrets_with_nested_content = json.dumps(
