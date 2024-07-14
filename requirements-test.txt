@@ -1,3 +1,5 @@
+- requirements.txt
+
 black>=24.4.2
 ruff>=0.5.1
 mypy>=1.10.1
