@@ -9,7 +9,7 @@ path = 'pydantic_settings_aws/version.py'
 name = 'pydantic-settings-aws'
 description = 'Settings management using AWS Secrets Manager and Pydantic'
 authors = [
-    {name = 'Rafael de Oliveira Marques', email = 'rafaelomarques@gmail.com'}
+    { name = 'Rafael de Oliveira Marques', email = 'rafaelomarques@gmail.com' },
 ]
 license = 'MIT'
 readme = 'README.md'
@@ -35,10 +35,7 @@ classifiers = [
     'Topic :: Internet',
 ]
 requires-python = '>=3.9'
-dependencies = [
-    'pydantic>=2.0.1',
-    'pydantic-settings>=2.0.2',
-]
+dependencies = ['pydantic>=2.0.1', 'pydantic-settings>=2.0.2']
 dynamic = ['version']
 
 
@@ -62,9 +59,7 @@ context = '${CONTEXT}'
 precision = 2
 
 [tool.coverage.paths]
-source = [
-    'pydantic_settings_aws/',
-]
+source = ['pydantic_settings_aws/']
 
 [tool.ruff]
 line-length = 80
@@ -72,7 +67,7 @@ target-version = 'py39'
 
 [tool.ruff.lint]
 extend-select = ['Q', 'RUF100', 'C90', 'UP', 'I']
-flake8-quotes = {inline-quotes = 'double', multiline-quotes = 'double'}
+flake8-quotes = { inline-quotes = 'double', multiline-quotes = 'double' }
 isort = { known-first-party = ['pydantic_settings_aws', 'tests'] }
 mccabe = { max-complexity = 14 }
 pydocstyle = { convention = 'google' }
