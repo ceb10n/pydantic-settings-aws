@@ -35,7 +35,11 @@ classifiers = [
     'Topic :: Internet',
 ]
 requires-python = '>=3.9'
-dependencies = ['pydantic>=2.0.1', 'pydantic-settings>=2.0.2']
+dependencies = [
+    'pydantic>=2.0.1',
+    'pydantic-settings>=2.0.2',
+    'boto3-stubs[secretsmanager]>=1.27.0',
+]
 dynamic = ['version']
 
 
