@@ -1,0 +1,46 @@
+site_name: Pydantic Settings AWS
+repo_url: https://github.com/ceb10n/pydantic-settings-aws
+
+theme:
+  name: "material"
+  icon:
+    repo: fontawesome/brands/github
+    edit: material/pencil
+    view: material/eye
+  features:
+    - content.action.edit
+    - content.code.annotate
+    - content.code.copy
+    - content.code.select
+    - content.tabs.link
+    - header.autohide
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.path
+    - navigation.tabs
+    - navigation.top
+    - search.highlight
+    - search.share
+    - search.suggest
+
+plugins:
+  - mkdocstrings
+  - search
+  - git-committers:
+      repository: ceb10n/pydantic-settings-aws
+      branch: master
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+
+nav:
+  - Pydantic Settings AWS Docs: index.md
+  - Reference: reference.md
