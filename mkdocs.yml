@@ -5,7 +5,7 @@ theme:
   name: "material"
   icon:
     repo: fontawesome/brands/github
-    edit: material/pencil 
+    edit: material/pencil
     view: material/eye
   features:
     - content.action.edit
