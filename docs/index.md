@@ -1,4 +1,4 @@
-# Pydantic Seettings AWS
+# Pydantic Settings AWS
 
 Pydantic Settings AWS is an extension of the great [Pydantic Settings](https://docs.pydantic.dev/latest/concepts/pydantic_settings/) library.
 
