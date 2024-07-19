@@ -29,10 +29,10 @@ def test_create_secrets_client(*args):
 
 
 @mock.patch(TARGET_SECRETS_CLIENT, mock_create_client)
-def test_get_boto3_client_must_create_a_client_if_its_not_given(*args):
+def test_get_secrets_boto3_client_must_create_a_client_if_its_not_given(*args):
     settings = BaseSettingsMock()
     settings.model_config = {}
-    client = aws._get_boto3_client(settings)
+    client = aws._get_secrets_boto3_client(settings)
 
     assert client is not None
 

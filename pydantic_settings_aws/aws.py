@@ -1,9 +1,10 @@
 import json
-from typing import Any, Optional
+from typing import Any, AnyStr, Dict, Optional, Union
 
 import boto3
 from mypy_boto3_secretsmanager import SecretsManagerClient
 from mypy_boto3_secretsmanager.type_defs import GetSecretValueResponseTypeDef
+from mypy_boto3_ssm import SSMClient
 from pydantic import ValidationError
 from pydantic_settings import BaseSettings
 
@@ -11,8 +12,32 @@ from .logger import logger
 from .models import AwsSecretsArgs, AwsSession
 
 
+def get_ssm_content(
+    settings: type[BaseSettings],
+    ssm_info: Optional[Union[Dict, AnyStr]] = None,
+    field_name: Optional[str] = None,
+) -> Optional[str]:
+    client: SSMClient = _get_ssm_boto3_client(settings)
+    ssm_name = None
+
+    if isinstance(ssm_info, str):
+        ssm_name = ssm_info
+    elif isinstance(ssm_info, dict):
+        ssm_name = ssm_info["ssm"]
+    else:
+        ssm_name = field_name
+
+    logger.debug("Getting ssm value with boto3 client")
+    ssm_response: GetSecretValueResponseTypeDef = client.get_parameter(
+        Name=ssm_name,
+        WithDecryption=True
+    )
+
+    return ssm_response.get("Parameter", {}).get("Value", None)
+
+
 def get_secrets_content(settings: type[BaseSettings]) -> dict[str, Any]:
-    client: SecretsManagerClient = _get_boto3_client(settings)
+    client: SecretsManagerClient = _get_secrets_boto3_client(settings)
     secrets_args: AwsSecretsArgs = _get_secrets_args(settings)
 
     logger.debug("Getting secrets manager value with boto3 client")
@@ -37,7 +62,7 @@ def get_secrets_content(settings: type[BaseSettings]) -> dict[str, Any]:
         raise json_err
 
 
-def _get_boto3_client(settings: type[BaseSettings]) -> SecretsManagerClient:
+def _get_secrets_boto3_client(settings: type[BaseSettings]) -> SecretsManagerClient:
     logger.debug("Getting secrets manager content.")
     client: SecretsManagerClient | None = settings.model_config.get(  # type: ignore
         "secrets_client", None
@@ -122,3 +147,43 @@ def _get_secrets_content(
                 raise err
 
     return secrets_content
+
+
+def _get_ssm_boto3_client(settings: type[BaseSettings]) -> SSMClient:
+    logger.debug("Getting secrets manager content.")
+    client: SSMClient | None = settings.model_config.get(  # type: ignore
+        "ssm_client", None
+    )
+
+    if client:
+        return client
+
+    logger.debug("No ssm boto3 client was informed. Will try to create a new one")
+    return _create_ssm_client(settings)
+
+
+def _create_ssm_client(
+    settings: type[BaseSettings],
+) -> SSMClient:
+    """Create a boto3 client for parameter store.
+
+    Neither `boto3` nor `pydantic` exceptions will be handled.
+
+    Args:
+        settings (BaseSettings): Settings from `pydantic_settings`
+
+    Returns:
+        SSMClient: A parameter ssm boto3 client.
+    """
+    logger.debug("Extracting settings prefixed with aws_")
+    args: dict[str, Any] = {
+        k: v for k, v in settings.model_config.items() if k.startswith("aws_")
+    }
+
+    session_args = AwsSession(**args)
+
+    session: boto3.Session = boto3.Session(
+        **session_args.model_dump(by_alias=True, exclude_none=True)
+    )
+
+    return session.client("ssm")
