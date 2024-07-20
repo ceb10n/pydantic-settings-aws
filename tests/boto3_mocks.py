@@ -13,10 +13,19 @@ class ClientMock:
     def __init__(
         self,
         secret_string: str = None,
-        secret_bytes: bytes = None
+        secret_bytes: bytes = None,
+        ssm_value: str = None
     ) -> None:
         self.secret_string = secret_string
         self.secret_bytes = secret_bytes
+        self.ssm_value = ssm_value
+
+    def get_parameter(self, Name=None, WithDecryption=None):
+        return {
+            "Parameter": {
+                "Value": self.ssm_value
+            }
+        }
 
     def get_secret_value(
         self, SecretId=None, VersionId=None, VersionStage=None

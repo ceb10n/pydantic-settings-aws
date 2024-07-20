@@ -1,10 +1,13 @@
 import json
-from typing import Optional
+from typing import Annotated, Optional
 
 from pydantic import BaseModel
 from pydantic_settings import SettingsConfigDict
 
-from pydantic_settings_aws import SecretsManagerBaseSettings
+from pydantic_settings_aws import (
+    ParameterStoreBaseSettings,
+    SecretsManagerBaseSettings,
+)
 
 from .boto3_mocks import ClientMock
 
@@ -54,3 +57,24 @@ class SecretsWithNestedContent(SecretsManagerBaseSettings):
     username: str
     password: str
     nested: NestedContent
+
+
+class ParameterSettings(ParameterStoreBaseSettings):
+    my_ssm: Annotated[str, {"ssm": "my/parameter", "ssm_client": ClientMock(ssm_value="value")}]
+
+
+class ParameterWithTwoSSMClientSettings(ParameterStoreBaseSettings):
+    model_config = SettingsConfigDict(
+        ssm_client=ClientMock(ssm_value="value")
+    )
+
+    my_ssm: Annotated[str, {"ssm": "my/parameter", "ssm_client": ClientMock(ssm_value="value")}]
+    my_ssm_2: Annotated[str, "my/ssm/2/parameter"]
+
+
+class ParameterWithOptionalValueSettings(ParameterStoreBaseSettings):
+    model_config = SettingsConfigDict(
+        ssm_client=ClientMock()
+    )
+
+    my_ssm: Annotated[Optional[str], "my/ssm/2/parameter"] = None

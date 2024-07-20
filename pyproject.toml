@@ -40,6 +40,7 @@ dependencies = [
     'pydantic-settings>=2.0.2',
     'boto3>=1.27.0',
     'boto3-stubs[secretsmanager]>=1.27.0',
+    'boto3-stubs[ssm]>=1.27.0'
 ]
 dynamic = ['version']
 
@@ -72,7 +73,7 @@ source = ['pydantic_settings_aws/']
 
 [tool.ruff]
 line-length = 80
-target-version = 'py39'
+target-version = 'py38'
 
 [tool.ruff.lint]
 extend-select = ['Q', 'RUF100', 'C90', 'UP', 'I']
