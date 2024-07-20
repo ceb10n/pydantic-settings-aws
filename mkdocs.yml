@@ -24,6 +24,8 @@ theme:
     - search.highlight
     - search.share
     - search.suggest
+  palette:
+    primary: orange
 
 plugins:
   - mkdocstrings
@@ -51,7 +53,11 @@ markdown_extensions:
 
 nav:
   - Pydantic Settings AWS Docs: index.md
+  - Configuration:
+    - Parameter Store: configuration/parameter-store.md
+    - Secrets Manager: configuration/secrets-manager.md
   - Examples:
+    - Parameter Store: examples/parameter-store.md
     - Secrets Manager: examples/secrets-manager.md
   - Reference: reference.md
 
