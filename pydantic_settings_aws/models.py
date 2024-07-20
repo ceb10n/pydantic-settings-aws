@@ -3,11 +3,6 @@ from typing import Optional
 from pydantic import BaseModel, ConfigDict, Field
 
 
-class ParameterStoreConfig(BaseModel):
-    model_config = ConfigDict(populate_by_name=True)
-
-
-
 class AwsSecretsArgs(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 

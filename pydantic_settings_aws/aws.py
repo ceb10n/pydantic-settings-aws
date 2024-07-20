@@ -14,23 +14,33 @@ from .models import AwsSecretsArgs, AwsSession
 
 def get_ssm_content(
     settings: type[BaseSettings],
-    ssm_info: Optional[Union[Dict, AnyStr]] = None,
-    field_name: Optional[str] = None,
+    field_name: str,
+    ssm_info: Optional[Union[Dict[Any, AnyStr], AnyStr]] = None
 ) -> Optional[str]:
-    client: SSMClient = _get_ssm_boto3_client(settings)
-    ssm_name = None
+    client = None
+    ssm_name = field_name
 
     if isinstance(ssm_info, str):
+        logger.debug("Parameter name specified as a str")
         ssm_name = ssm_info
-    elif isinstance(ssm_info, dict):
-        ssm_name = ssm_info["ssm"]
-    else:
-        ssm_name = field_name
 
-    logger.debug("Getting ssm value with boto3 client")
-    ssm_response: GetSecretValueResponseTypeDef = client.get_parameter(
-        Name=ssm_name,
-        WithDecryption=True
+    elif isinstance(ssm_info, dict):
+        logger.debug("Parameter specified as a dict")
+        ssm_name = str(ssm_info["ssm"])
+
+        logger.debug("Checking for a especific boto3 client for the Parameter")
+        client = ssm_info.get("ssm_client", None)
+
+    else:
+        logger.debug("Will try to find a parameter with the parameter name")
+
+    if not client:
+        logger.debug("Boto3 client not specified in metadata")
+        client = _get_ssm_boto3_client(settings) # type: ignore
+
+    logger.debug(f"Getting parameter {ssm_name} value with boto3 client")
+    ssm_response: dict[str, Any] = client.get_parameter( # type: ignore
+        Name=ssm_name, WithDecryption=True
     )
 
     return ssm_response.get("Parameter", {}).get("Value", None)
@@ -62,7 +72,9 @@ def get_secrets_content(settings: type[BaseSettings]) -> dict[str, Any]:
         raise json_err
 
 
-def _get_secrets_boto3_client(settings: type[BaseSettings]) -> SecretsManagerClient:
+def _get_secrets_boto3_client(
+    settings: type[BaseSettings],
+) -> SecretsManagerClient:
     logger.debug("Getting secrets manager content.")
     client: SecretsManagerClient | None = settings.model_config.get(  # type: ignore
         "secrets_client", None
@@ -158,7 +170,9 @@ def _get_ssm_boto3_client(settings: type[BaseSettings]) -> SSMClient:
     if client:
         return client
 
-    logger.debug("No ssm boto3 client was informed. Will try to create a new one")
+    logger.debug(
+        "No ssm boto3 client was informed. Will try to create a new one"
+    )
     return _create_ssm_client(settings)
 
 

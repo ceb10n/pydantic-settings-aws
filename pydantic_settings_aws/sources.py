@@ -11,10 +11,6 @@ from pydantic_settings_aws import aws, utils
 
 class ParameterStoreSettingsSource(PydanticBaseSettingsSource):
     """Source class for loading settings from AWS Parameter Store.
-
-    no args
-
-
     """
     def __init__(self, settings_cls: type[BaseSettings]):
         super().__init__(settings_cls)
@@ -23,7 +19,7 @@ class ParameterStoreSettingsSource(PydanticBaseSettingsSource):
         self, field: FieldInfo, field_name: str
     ) -> tuple[Any, str, bool]:
         ssm_info = utils.get_ssm_name_from_annotated_field(field.metadata)
-        field_value = self._json_content.get(field_name)
+        field_value = aws.get_ssm_content(self.settings_cls, field_name, ssm_info)
 
         return field_value, field_name, False
 

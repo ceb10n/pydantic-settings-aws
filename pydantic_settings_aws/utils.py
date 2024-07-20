@@ -9,10 +9,14 @@ def get_ssm_name_from_annotated_field(metadata: List[Any]) -> Optional[str]:
     if ssm_metadata:
         return ssm_metadata[0]
 
+    return None
+
 
 def _get_ssm_info_from_metadata(metadata: Any) -> Optional[Any]:
     if isinstance(metadata, str):
         return metadata
-    
+
     if isinstance(metadata, dict) and "ssm" in metadata.keys():
         return metadata
+
+    return None
