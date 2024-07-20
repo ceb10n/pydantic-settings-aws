@@ -1,6 +1,6 @@
-from .settings import SecretsManagerBaseSettings
+from .settings import ParameterStoreBaseSettings, SecretsManagerBaseSettings
 from .version import VERSION
 
-__all__ = [ "SecretsManagerBaseSettings" ]
+__all__ = ["ParameterStoreBaseSettings", "SecretsManagerBaseSettings"]
 
 __version__ = VERSION
