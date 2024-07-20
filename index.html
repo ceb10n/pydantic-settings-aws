@@ -6,11 +6,15 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
+        <meta name="description" content="AWS Secrets Manger & Parameter Store for Pydantic Settings">
       
       
       
+        <link rel="canonical" href="https://ceb10n.github.io/pydantic-settings-aws/">
       
-        <link rel="next" href="reference/">
+      
+      
+        <link rel="next" href="configuration/parameter-store/">
       
       
       <link rel="icon" href="assets/images/favicon.png">
@@ -23,6 +27,9 @@
     
     
       <link rel="stylesheet" href="assets/stylesheets/main.76a95c52.min.css">
+      
+        
+        <link rel="stylesheet" href="assets/stylesheets/palette.06af60db.min.css">
       
       
 
@@ -43,6 +50,8 @@
     
       <link rel="stylesheet" href="assets/_mkdocstrings.css">
     
+      <link rel="stylesheet" href="stylesheets/extra.css">
+    
     <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -53,7 +62,12 @@
   </head>
   
   
-    <body dir="ltr">
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="orange" data-md-color-accent="indigo">
   
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
@@ -103,8 +117,8 @@
       </div>
     </div>
     
+      
     
-      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
     
     
     
@@ -195,6 +209,42 @@
 
       </a>
     </li>
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="configuration/parameter-store/" class="md-tabs__link">
+          
+  
+  Configuration
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="examples/parameter-store/" class="md-tabs__link">
+          
+  
+  Examples
+
+        </a>
+      </li>
+    
   
 
       
@@ -344,6 +394,180 @@
   
   
   
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Configuration
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Configuration
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="configuration/parameter-store/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Parameter Store
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="configuration/secrets-manager/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Secrets Manager
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Examples
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Examples
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/parameter-store/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Parameter Store
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/secrets-manager/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Secrets Manager
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
     <li class="md-nav__item">
       <a href="reference/" class="md-nav__link">
         
@@ -426,8 +650,15 @@
 
 
 <h1 id="pydantic-settings-aws">Pydantic Settings AWS</h1>
-<p>Pydantic Settings AWS is an extension of the great <a href="https://docs.pydantic.dev/latest/concepts/pydantic_settings/">Pydantic Settings</a> library.</p>
-<p>It offers an easy way to load AWS settings from <a href="https://aws.amazon.com/secrets-manager/">Secrets Manager</a>.</p>
+<p><a href="https://github.com/ceb10n/pydantic-settings-aws/actions"><img alt="CI" src="https://github.com/ceb10n/pydantic-settings-aws/actions/workflows/ci.yml/badge.svg" /></a>
+<a href="https://codecov.io/github/ceb10n/pydantic-settings-aws"><img alt="codecov" src="https://codecov.io/github/ceb10n/pydantic-settings-aws/graph/badge.svg?token=K77HYDZR3P" /></a>
+<a href="https://pypi.org/project/pydantic-settings-aws"><img alt="PyPI - Implementation" src="https://img.shields.io/pypi/implementation/pydantic-settings-aws" /></a>
+<a href="https://pypi.org/project/pydantic-settings-aws"><img alt="PyPI - Python Version" src="https://img.shields.io/pypi/pyversions/pydantic-settings-aws" /></a>
+<a href="https://docs.pydantic.dev/latest/contributing/#badges"><img alt="Pydantic v2 only" src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/pydantic/pydantic/main/docs/badge/v2.json" /></a>
+<a href="https://pypi.org/project/pydantic-settings-aws"><img alt="PyPI - License" src="https://img.shields.io/pypi/l/pydantic-settings-aws" /></a>
+<a href="https://pepy.tech/project/pydantic-settings-aws"><img alt="Downloads" src="https://static.pepy.tech/badge/pydantic-settings-aws/month" /></a></p>
+<p>Pydantic Settings AWS is an extension of the great 🚀 <a href="https://docs.pydantic.dev/latest/concepts/pydantic_settings/">Pydantic Settings</a> library.</p>
+<p>It offers an easy way to load your settings hosted in ☁️ AWS <a href="https://aws.amazon.com/secrets-manager/">Secrets Manager</a> and <a href="https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html">Parameter Store</a>.</p>
 <h2 id="installation">Installation</h2>
 <p>You can install pydantic-settings-aws with <a href="https://pypi.org/project/pip/">pip</a>:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip<span class="w"> </span>install<span class="w"> </span>pydantic-settings-aws
