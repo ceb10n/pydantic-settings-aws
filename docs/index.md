@@ -1,8 +1,16 @@
 # Pydantic Settings AWS
 
-Pydantic Settings AWS is an extension of the great [Pydantic Settings](https://docs.pydantic.dev/latest/concepts/pydantic_settings/) library.
+[![CI](https://github.com/ceb10n/pydantic-settings-aws/actions/workflows/ci.yml/badge.svg)](https://github.com/ceb10n/pydantic-settings-aws/actions)
+[![codecov](https://codecov.io/github/ceb10n/pydantic-settings-aws/graph/badge.svg?token=K77HYDZR3P)](https://codecov.io/github/ceb10n/pydantic-settings-aws)
+[![PyPI - Implementation](https://img.shields.io/pypi/implementation/pydantic-settings-aws)](https://pypi.org/project/pydantic-settings-aws)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pydantic-settings-aws)](https://pypi.org/project/pydantic-settings-aws)
+[![Pydantic v2 only](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/pydantic/pydantic/main/docs/badge/v2.json)](https://docs.pydantic.dev/latest/contributing/#badges)
+[![PyPI - License](https://img.shields.io/pypi/l/pydantic-settings-aws)](https://pypi.org/project/pydantic-settings-aws)
+[![Downloads](https://static.pepy.tech/badge/pydantic-settings-aws/month)](https://pepy.tech/project/pydantic-settings-aws)
 
-It offers an easy way to load AWS settings from [Secrets Manager](https://aws.amazon.com/secrets-manager/).
+Pydantic Settings AWS is an extension of the great 🚀 [Pydantic Settings](https://docs.pydantic.dev/latest/concepts/pydantic_settings/) library.
+
+It offers an easy way to load your settings hosted in ☁️ AWS [Secrets Manager](https://aws.amazon.com/secrets-manager/) and [Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html).
 
 ## Installation
 

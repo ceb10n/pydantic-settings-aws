@@ -1,5 +1,7 @@
 site_name: Pydantic Settings AWS
+site_description: AWS Secrets Manger & Parameter Store for Pydantic Settings
 repo_url: https://github.com/ceb10n/pydantic-settings-aws
+site_url: https://ceb10n.github.io/pydantic-settings-aws/
 
 theme:
   name: "material"
@@ -31,6 +33,11 @@ plugins:
       branch: master
 
 markdown_extensions:
+  - admonition
+  - attr_list
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
   - pymdownx.highlight:
       anchor_linenums: true
       line_spans: __span
@@ -40,7 +47,13 @@ markdown_extensions:
   - pymdownx.superfences
   - pymdownx.tabbed:
       alternate_style: true
+  - tables
 
 nav:
   - Pydantic Settings AWS Docs: index.md
+  - Examples:
+    - Secrets Manager: examples/secrets-manager.md
   - Reference: reference.md
+
+extra_css:
+  - stylesheets/extra.css

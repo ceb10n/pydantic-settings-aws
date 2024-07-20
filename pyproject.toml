@@ -43,6 +43,10 @@ dependencies = [
 ]
 dynamic = ['version']
 
+[project.urls]
+Homepage = "https://github.com/ceb10n/pydantic-settings-aws"
+Documentation = "https://ceb10n.github.io/pydantic-settings-aws/"
+Repository = "https://github.com/ceb10n/pydantic-settings-aws"
 
 [tool.pytest.ini_options]
 testpaths = 'tests'
