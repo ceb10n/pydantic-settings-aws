@@ -1,8 +1,9 @@
 import json
-from typing import Annotated, Optional
+from typing import List, Optional
 
 from pydantic import BaseModel
 from pydantic_settings import SettingsConfigDict
+from typing_extensions import Annotated
 
 from pydantic_settings_aws import (
     ParameterStoreBaseSettings,
@@ -45,7 +46,7 @@ mock_secrets_with_nested_content = ClientMock(
 
 
 class NestedContent(BaseModel):
-    roles: list[str]
+    roles: List[str]
 
 
 class SecretsWithNestedContent(SecretsManagerBaseSettings):

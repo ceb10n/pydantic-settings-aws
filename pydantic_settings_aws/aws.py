@@ -1,5 +1,5 @@
 import json
-from typing import Any, AnyStr, Dict, Optional, Union
+from typing import Any, AnyStr, Dict, Optional, Type, Union
 
 import boto3  # type: ignore[import-untyped]
 from pydantic import ValidationError
@@ -10,7 +10,7 @@ from .models import AwsSecretsArgs, AwsSession
 
 
 def get_ssm_content(
-    settings: type[BaseSettings],
+    settings: Type[BaseSettings],
     field_name: str,
     ssm_info: Optional[Union[Dict[Any, AnyStr], AnyStr]] = None
 ) -> Optional[str]:
@@ -36,14 +36,14 @@ def get_ssm_content(
         client = _get_ssm_boto3_client(settings)
 
     logger.debug(f"Getting parameter {ssm_name} value with boto3 client")
-    ssm_response: dict[str, Any] = client.get_parameter( # type: ignore
+    ssm_response: Dict[str, Any] = client.get_parameter( # type: ignore
         Name=ssm_name, WithDecryption=True
     )
 
     return ssm_response.get("Parameter", {}).get("Value", None)
 
 
-def get_secrets_content(settings: type[BaseSettings]) -> dict[str, Any]:
+def get_secrets_content(settings: Type[BaseSettings]) -> Dict[str, Any]:
     client = _get_secrets_boto3_client(settings)
     secrets_args: AwsSecretsArgs = _get_secrets_args(settings)
 
@@ -69,7 +69,7 @@ def get_secrets_content(settings: type[BaseSettings]) -> dict[str, Any]:
         raise json_err
 
 
-def _get_secrets_boto3_client( settings: type[BaseSettings]): # type: ignore[no-untyped-def]
+def _get_secrets_boto3_client( settings: Type[BaseSettings]): # type: ignore[no-untyped-def]
     logger.debug("Getting secrets manager content.")
     client = settings.model_config.get("secrets_client", None)
 
@@ -80,7 +80,7 @@ def _get_secrets_boto3_client( settings: type[BaseSettings]): # type: ignore[no-
     return _create_secrets_client(settings)
 
 
-def _create_secrets_client(settings: type[BaseSettings]):  # type: ignore[no-untyped-def]
+def _create_secrets_client(settings: Type[BaseSettings]):  # type: ignore[no-untyped-def]
     """Create a boto3 client for secrets manager.
 
     Neither `boto3` nor `pydantic` exceptions will be handled.
@@ -92,7 +92,7 @@ def _create_secrets_client(settings: type[BaseSettings]):  # type: ignore[no-unt
         SecretsManagerClient: A secrets manager boto3 client.
     """
     logger.debug("Extracting settings prefixed with aws_")
-    args: dict[str, Any] = {
+    args: Dict[str, Any] = {
         k: v for k, v in settings.model_config.items() if k.startswith("aws_")
     }
 
@@ -105,11 +105,11 @@ def _create_secrets_client(settings: type[BaseSettings]):  # type: ignore[no-unt
     return session.client("secretsmanager")
 
 
-def _get_secrets_args(settings: type[BaseSettings]) -> AwsSecretsArgs:
+def _get_secrets_args(settings: Type[BaseSettings]) -> AwsSecretsArgs:
     logger.debug(
         "Extracting settings prefixed with secrets_, except _client and _dir"
     )
-    args: dict[str, Any] = {
+    args: Dict[str, Any] = {
         k: v
         for k, v in settings.model_config.items()
         if k.startswith("secrets_")
@@ -139,7 +139,7 @@ def _get_secrets_content(
         logger.debug(
             "SecretString was not present. Getting content from SecretBinary."
         )
-        secret_binary: bytes | None = secret.get("SecretBinary")
+        secret_binary: Optional[bytes] = secret.get("SecretBinary")
 
         if secret_binary:
             try:
@@ -152,7 +152,7 @@ def _get_secrets_content(
     return secrets_content
 
 
-def _get_ssm_boto3_client(settings: type[BaseSettings]): # type: ignore[no-untyped-def]
+def _get_ssm_boto3_client(settings: Type[BaseSettings]): # type: ignore[no-untyped-def]
     logger.debug("Getting secrets manager content.")
     client = settings.model_config.get("ssm_client", None)
 
@@ -165,7 +165,7 @@ def _get_ssm_boto3_client(settings: type[BaseSettings]): # type: ignore[no-untyp
     return _create_ssm_client(settings)
 
 
-def _create_ssm_client(settings: type[BaseSettings]): # type: ignore[no-untyped-def]
+def _create_ssm_client(settings: Type[BaseSettings]): # type: ignore[no-untyped-def]
     """Create a boto3 client for parameter store.
 
     Neither `boto3` nor `pydantic` exceptions will be handled.
@@ -177,7 +177,7 @@ def _create_ssm_client(settings: type[BaseSettings]): # type: ignore[no-untyped-
         SSMClient: A parameter ssm boto3 client.
     """
     logger.debug("Extracting settings prefixed with aws_")
-    args: dict[str, Any] = {
+    args: Dict[str, Any] = {
         k: v for k, v in settings.model_config.items() if k.startswith("aws_")
     }
 
