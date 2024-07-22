@@ -1,10 +1,7 @@
 import json
 from typing import Any, AnyStr, Dict, Optional, Union
 
-import boto3
-from mypy_boto3_secretsmanager import SecretsManagerClient
-from mypy_boto3_secretsmanager.type_defs import GetSecretValueResponseTypeDef
-from mypy_boto3_ssm import SSMClient
+import boto3  # type: ignore[import-untyped]
 from pydantic import ValidationError
 from pydantic_settings import BaseSettings
 
@@ -36,7 +33,7 @@ def get_ssm_content(
 
     if not client:
         logger.debug("Boto3 client not specified in metadata")
-        client = _get_ssm_boto3_client(settings) # type: ignore
+        client = _get_ssm_boto3_client(settings)
 
     logger.debug(f"Getting parameter {ssm_name} value with boto3 client")
     ssm_response: dict[str, Any] = client.get_parameter( # type: ignore
@@ -47,11 +44,11 @@ def get_ssm_content(
 
 
 def get_secrets_content(settings: type[BaseSettings]) -> dict[str, Any]:
-    client: SecretsManagerClient = _get_secrets_boto3_client(settings)
+    client = _get_secrets_boto3_client(settings)
     secrets_args: AwsSecretsArgs = _get_secrets_args(settings)
 
     logger.debug("Getting secrets manager value with boto3 client")
-    secret_response: GetSecretValueResponseTypeDef = client.get_secret_value(
+    secret_response = client.get_secret_value(
         **secrets_args.model_dump(by_alias=True, exclude_none=True)
     )
 
@@ -72,13 +69,9 @@ def get_secrets_content(settings: type[BaseSettings]) -> dict[str, Any]:
         raise json_err
 
 
-def _get_secrets_boto3_client(
-    settings: type[BaseSettings],
-) -> SecretsManagerClient:
+def _get_secrets_boto3_client( settings: type[BaseSettings]): # type: ignore[no-untyped-def]
     logger.debug("Getting secrets manager content.")
-    client: SecretsManagerClient | None = settings.model_config.get(  # type: ignore
-        "secrets_client", None
-    )
+    client = settings.model_config.get("secrets_client", None)
 
     if client:
         return client
@@ -87,9 +80,7 @@ def _get_secrets_boto3_client(
     return _create_secrets_client(settings)
 
 
-def _create_secrets_client(
-    settings: type[BaseSettings],
-) -> SecretsManagerClient:
+def _create_secrets_client(settings: type[BaseSettings]):  # type: ignore[no-untyped-def]
     """Create a boto3 client for secrets manager.
 
     Neither `boto3` nor `pydantic` exceptions will be handled.
@@ -136,7 +127,7 @@ def _get_secrets_args(settings: type[BaseSettings]) -> AwsSecretsArgs:
 
 
 def _get_secrets_content(
-    secret: GetSecretValueResponseTypeDef,
+    secret: Dict[str, Any],
 ) -> Optional[str]:
     secrets_content: Optional[str] = None
 
@@ -161,11 +152,9 @@ def _get_secrets_content(
     return secrets_content
 
 
-def _get_ssm_boto3_client(settings: type[BaseSettings]) -> SSMClient:
+def _get_ssm_boto3_client(settings: type[BaseSettings]): # type: ignore[no-untyped-def]
     logger.debug("Getting secrets manager content.")
-    client: SSMClient | None = settings.model_config.get(  # type: ignore
-        "ssm_client", None
-    )
+    client = settings.model_config.get("ssm_client", None)
 
     if client:
         return client
@@ -176,9 +165,7 @@ def _get_ssm_boto3_client(settings: type[BaseSettings]) -> SSMClient:
     return _create_ssm_client(settings)
 
 
-def _create_ssm_client(
-    settings: type[BaseSettings],
-) -> SSMClient:
+def _create_ssm_client(settings: type[BaseSettings]): # type: ignore[no-untyped-def]
     """Create a boto3 client for parameter store.
 
     Neither `boto3` nor `pydantic` exceptions will be handled.
