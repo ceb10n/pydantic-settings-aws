@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Dict, Tuple, Type
 
 from pydantic.fields import FieldInfo
 from pydantic_settings import (
@@ -12,12 +12,12 @@ from pydantic_settings_aws import aws, utils
 class ParameterStoreSettingsSource(PydanticBaseSettingsSource):
     """Source class for loading settings from AWS Parameter Store.
     """
-    def __init__(self, settings_cls: type[BaseSettings]):
+    def __init__(self, settings_cls: Type[BaseSettings]):
         super().__init__(settings_cls)
 
     def get_field_value(
         self, field: FieldInfo, field_name: str
-    ) -> tuple[Any, str, bool]:
+    ) -> Tuple[Any, str, bool]:
         ssm_info = utils.get_ssm_name_from_annotated_field(field.metadata)
         field_value = aws.get_ssm_content(self.settings_cls, field_name, ssm_info)
 
@@ -32,8 +32,8 @@ class ParameterStoreSettingsSource(PydanticBaseSettingsSource):
     ) -> Any:
         return value
 
-    def __call__(self) -> dict[str, Any]:
-        d: dict[str, Any] = {}
+    def __call__(self) -> Dict[str, Any]:
+        d: Dict[str, Any] = {}
 
         for field_name, field in self.settings_cls.model_fields.items():
             field_value, field_key, value_is_complex = self.get_field_value(
@@ -49,13 +49,13 @@ class ParameterStoreSettingsSource(PydanticBaseSettingsSource):
 
 
 class SecretsManagerSettingsSource(PydanticBaseSettingsSource):
-    def __init__(self, settings_cls: type[BaseSettings]):
+    def __init__(self, settings_cls: Type[BaseSettings]):
         super().__init__(settings_cls)
         self._json_content = aws.get_secrets_content(settings_cls)
 
     def get_field_value(
         self, field: FieldInfo, field_name: str
-    ) -> tuple[Any, str, bool]:
+    ) -> Tuple[Any, str, bool]:
         field_value = self._json_content.get(field_name)
         return field_value, field_name, False
 
@@ -68,8 +68,8 @@ class SecretsManagerSettingsSource(PydanticBaseSettingsSource):
     ) -> Any:
         return value
 
-    def __call__(self) -> dict[str, Any]:
-        d: dict[str, Any] = {}
+    def __call__(self) -> Dict[str, Any]:
+        d: Dict[str, Any] = {}
 
         for field_name, field in self.settings_cls.model_fields.items():
             field_value, field_key, value_is_complex = self.get_field_value(
