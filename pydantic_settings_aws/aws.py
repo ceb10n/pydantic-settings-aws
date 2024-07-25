@@ -12,6 +12,8 @@ AWSService = Literal["ssm", "secretsmanager"]
 
 ClientParam = Literal["secrets_client", "ssm_client"]
 
+_client_cache: Dict[str, Any] = {}
+
 
 def get_ssm_content(
     settings: Type[BaseSettings],
@@ -153,8 +155,16 @@ def _create_boto3_client(session_args: AwsSession, service: AWSService):  # type
     Returns:
         boto3.client: An aws service boto3 client.
     """
+    cache_key = service + "_" + session_args.session_key()
+
+    if cache_key in _client_cache:
+        return _client_cache[cache_key]
+
     session: boto3.Session = boto3.Session(
         **session_args.model_dump(by_alias=True, exclude_none=True)
     )
 
-    return session.client(service)
+    client = session.client(service)
+    _client_cache[cache_key] = client
+
+    return client

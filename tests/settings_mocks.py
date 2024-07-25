@@ -70,6 +70,7 @@ class ParameterWithTwoSSMClientSettings(ParameterStoreBaseSettings):
     )
 
     my_ssm: Annotated[str, {"ssm": "my/parameter", "ssm_client": ClientMock(ssm_value="value")}]
+    my_ssm_1: Annotated[str, {"ssm": "my/parameter", "ssm_client": ClientMock(ssm_value="value1")}]
     my_ssm_2: Annotated[str, "my/ssm/2/parameter"]
 
 
