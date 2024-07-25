@@ -1,5 +1,5 @@
 import json
-from typing import Any, AnyStr, Dict, Optional, Type, Union
+from typing import Any, AnyStr, Dict, Literal, Optional, Type, Union
 
 import boto3  # type: ignore[import-untyped]
 from pydantic import ValidationError
@@ -8,11 +8,15 @@ from pydantic_settings import BaseSettings
 from .logger import logger
 from .models import AwsSecretsArgs, AwsSession
 
+AWSService = Literal["ssm", "secretsmanager"]
+
+ClientParam = Literal["secrets_client", "ssm_client"]
+
 
 def get_ssm_content(
     settings: Type[BaseSettings],
     field_name: str,
-    ssm_info: Optional[Union[Dict[Any, AnyStr], AnyStr]] = None
+    ssm_info: Optional[Union[Dict[Any, AnyStr], AnyStr]] = None,
 ) -> Optional[str]:
     client = None
     ssm_name = field_name
@@ -33,10 +37,10 @@ def get_ssm_content(
 
     if not client:
         logger.debug("Boto3 client not specified in metadata")
-        client = _get_ssm_boto3_client(settings)
+        client = _create_client_from_settings(settings, "ssm", "ssm_client")
 
     logger.debug(f"Getting parameter {ssm_name} value with boto3 client")
-    ssm_response: Dict[str, Any] = client.get_parameter( # type: ignore
+    ssm_response: Dict[str, Any] = client.get_parameter(  # type: ignore
         Name=ssm_name, WithDecryption=True
     )
 
@@ -44,7 +48,9 @@ def get_ssm_content(
 
 
 def get_secrets_content(settings: Type[BaseSettings]) -> Dict[str, Any]:
-    client = _get_secrets_boto3_client(settings)
+    client = _create_client_from_settings(
+        settings, "secretsmanager", "secrets_client"
+    )
     secrets_args: AwsSecretsArgs = _get_secrets_args(settings)
 
     logger.debug("Getting secrets manager value with boto3 client")
@@ -67,42 +73,6 @@ def get_secrets_content(settings: Type[BaseSettings]) -> Dict[str, Any]:
             f"The content of the secrets manager must be a valid json: {json_err}"
         )
         raise json_err
-
-
-def _get_secrets_boto3_client( settings: Type[BaseSettings]): # type: ignore[no-untyped-def]
-    logger.debug("Getting secrets manager content.")
-    client = settings.model_config.get("secrets_client", None)
-
-    if client:
-        return client
-
-    logger.debug("No boto3 client was informed. Will try to create a new one")
-    return _create_secrets_client(settings)
-
-
-def _create_secrets_client(settings: Type[BaseSettings]):  # type: ignore[no-untyped-def]
-    """Create a boto3 client for secrets manager.
-
-    Neither `boto3` nor `pydantic` exceptions will be handled.
-
-    Args:
-        settings (BaseSettings): Settings from `pydantic_settings`
-
-    Returns:
-        SecretsManagerClient: A secrets manager boto3 client.
-    """
-    logger.debug("Extracting settings prefixed with aws_")
-    args: Dict[str, Any] = {
-        k: v for k, v in settings.model_config.items() if k.startswith("aws_")
-    }
-
-    session_args = AwsSession(**args)
-
-    session: boto3.Session = boto3.Session(
-        **session_args.model_dump(by_alias=True, exclude_none=True)
-    )
-
-    return session.client("secretsmanager")
 
 
 def _get_secrets_args(settings: Type[BaseSettings]) -> AwsSecretsArgs:
@@ -152,30 +122,14 @@ def _get_secrets_content(
     return secrets_content
 
 
-def _get_ssm_boto3_client(settings: Type[BaseSettings]): # type: ignore[no-untyped-def]
-    logger.debug("Getting secrets manager content.")
-    client = settings.model_config.get("ssm_client", None)
+def _create_client_from_settings(  # type: ignore[no-untyped-def]
+    settings: Type[BaseSettings], service: AWSService, client_param: ClientParam
+):
+    client = settings.model_config.get(client_param)
 
     if client:
         return client
 
-    logger.debug(
-        "No ssm boto3 client was informed. Will try to create a new one"
-    )
-    return _create_ssm_client(settings)
-
-
-def _create_ssm_client(settings: Type[BaseSettings]): # type: ignore[no-untyped-def]
-    """Create a boto3 client for parameter store.
-
-    Neither `boto3` nor `pydantic` exceptions will be handled.
-
-    Args:
-        settings (BaseSettings): Settings from `pydantic_settings`
-
-    Returns:
-        SSMClient: A parameter ssm boto3 client.
-    """
     logger.debug("Extracting settings prefixed with aws_")
     args: Dict[str, Any] = {
         k: v for k, v in settings.model_config.items() if k.startswith("aws_")
@@ -183,8 +137,24 @@ def _create_ssm_client(settings: Type[BaseSettings]): # type: ignore[no-untyped-
 
     session_args = AwsSession(**args)
 
+    return _create_boto3_client(session_args, service)
+
+
+def _create_boto3_client(session_args: AwsSession, service: AWSService):  # type: ignore[no-untyped-def]
+    """Create a boto3 client for the service informed.
+
+    Neither `boto3` nor `pydantic` exceptions will be handled.
+
+    Args:
+        session_args (AwsSession): Settings informed in `SettingsConfigDict` to create
+            the boto3 session.
+        service (str): The service client that will be created.
+
+    Returns:
+        boto3.client: An aws service boto3 client.
+    """
     session: boto3.Session = boto3.Session(
         **session_args.model_dump(by_alias=True, exclude_none=True)
     )
 
-    return session.client("ssm")
+    return session.client(service)
