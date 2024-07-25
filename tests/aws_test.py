@@ -7,11 +7,11 @@ from pydantic import ValidationError
 from pydantic_settings_aws import aws
 
 from .aws_mocks import (
+    TARGET_CREATE_CLIENT_FROM_SETTINGS,
     TARGET_SECRET_CONTENT,
     TARGET_SECRETS_BOTO3_CLIENT,
     TARGET_SECRETS_CLIENT,
     TARGET_SESSION,
-    TARGET_SSM_CLIENT,
     BaseSettingsMock,
     mock_create_client,
     mock_secrets_content_empty,
@@ -21,7 +21,7 @@ from .aws_mocks import (
 from .boto3_mocks import SessionMock
 
 
-@mock.patch(TARGET_SSM_CLIENT, mock_ssm)
+@mock.patch(TARGET_CREATE_CLIENT_FROM_SETTINGS, mock_ssm)
 def test_get_ssm_content_must_return_parameter_content_if_annotated_with_parameter_name(*args):
     settings = BaseSettingsMock()
     settings.model_config = {"aws_region": "region", "aws_profile": "profile"}
@@ -31,7 +31,7 @@ def test_get_ssm_content_must_return_parameter_content_if_annotated_with_paramet
     assert isinstance(parameter_value, str)
 
 
-@mock.patch(TARGET_SSM_CLIENT, mock_ssm)
+@mock.patch(TARGET_CREATE_CLIENT_FROM_SETTINGS, mock_ssm)
 def test_get_ssm_content_must_return_parameter_content_if_annotated_with_dict_args(*args):
     settings = BaseSettingsMock()
     settings.model_config = {"aws_region": "region", "aws_profile": "profile"}
@@ -41,7 +41,7 @@ def test_get_ssm_content_must_return_parameter_content_if_annotated_with_dict_ar
     assert isinstance(parameter_value, str)
 
 
-@mock.patch(TARGET_SSM_CLIENT, mock_ssm)
+@mock.patch(TARGET_CREATE_CLIENT_FROM_SETTINGS, mock_ssm)
 def test_get_ssm_content_must_use_client_if_present_in_metadata(*args):
     settings = BaseSettingsMock()
     settings.model_config = {"aws_region": "region", "aws_profile": "profile"}
@@ -51,7 +51,7 @@ def test_get_ssm_content_must_use_client_if_present_in_metadata(*args):
     assert isinstance(parameter_value, str)
 
 
-@mock.patch(TARGET_SSM_CLIENT, mock_ssm)
+@mock.patch(TARGET_CREATE_CLIENT_FROM_SETTINGS, mock_ssm)
 def test_get_ssm_content_must_use_field_name_if_ssm_name_not_in_metadata(*args):
     settings = BaseSettingsMock()
     settings.model_config = {"aws_region": "region", "aws_profile": "profile"}
@@ -65,16 +65,16 @@ def test_get_ssm_content_must_use_field_name_if_ssm_name_not_in_metadata(*args):
 def test_create_ssm_client(*args):
     settings = BaseSettingsMock()
     settings.model_config = {"aws_region": "region", "aws_profile": "profile"}
-    client = aws._create_ssm_client(settings)
+    client = aws._create_client_from_settings(settings, "ssm", "ssm_client")
 
     assert client is not None
 
 
-@mock.patch(TARGET_SSM_CLIENT, mock_create_client)
+@mock.patch(TARGET_CREATE_CLIENT_FROM_SETTINGS, mock_create_client)
 def test_get_ssm_boto3_client_must_create_a_client_if_its_not_given(*args):
     settings = BaseSettingsMock()
     settings.model_config = {}
-    client = aws._get_ssm_boto3_client(settings)
+    client = aws._create_client_from_settings(settings, "ssm", "ssm_client")
 
     assert client is not None
 
@@ -83,22 +83,22 @@ def test_get_ssm_boto3_client_must_create_a_client_if_its_not_given(*args):
 def test_create_secrets_client(*args):
     settings = BaseSettingsMock()
     settings.model_config = {"aws_region": "region", "aws_profile": "profile"}
-    client = aws._create_secrets_client(settings)
+    client = aws._create_client_from_settings(settings, "secretsmanager", "secrets_client")
 
     assert client is not None
 
 
-@mock.patch(TARGET_SECRETS_CLIENT, mock_create_client)
+@mock.patch(TARGET_CREATE_CLIENT_FROM_SETTINGS, mock_create_client)
 def test_get_secrets_boto3_client_must_create_a_client_if_its_not_given(*args):
     settings = BaseSettingsMock()
     settings.model_config = {}
-    client = aws._get_secrets_boto3_client(settings)
+    client = aws._create_client_from_settings(settings, "secretsmanager", "secrets_client")
 
     assert client is not None
 
 
-@mock.patch(TARGET_SECRETS_BOTO3_CLIENT, mock_secrets_content_empty)
 @mock.patch(TARGET_SECRET_CONTENT, lambda *args: None)
+@mock.patch(TARGET_CREATE_CLIENT_FROM_SETTINGS, mock_secrets_content_empty)
 def test_get_secrets_content_must_raise_value_error_if_secrets_content_is_none(
     *args,
 ):
@@ -113,7 +113,7 @@ def test_get_secrets_content_must_raise_value_error_if_secrets_content_is_none(
         aws.get_secrets_content(settings)
 
 
-@mock.patch(TARGET_SECRETS_BOTO3_CLIENT, mock_secrets_content_invalid_json)
+@mock.patch(TARGET_CREATE_CLIENT_FROM_SETTINGS, mock_secrets_content_invalid_json)
 def test_should_not_obfuscate_json_error_in_case_of_invalid_secrets(*args):
     settings = BaseSettingsMock()
     settings.model_config = {

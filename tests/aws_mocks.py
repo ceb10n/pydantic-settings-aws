@@ -8,9 +8,9 @@ TARGET_SECRETS_BOTO3_CLIENT = "pydantic_settings_aws.aws._get_secrets_boto3_clie
 
 TARGET_SSM_BOTO3_CLIENT = "pydantic_settings_aws.aws._get_ssm_boto3_client"
 
-TARGET_SECRETS_CLIENT = "pydantic_settings_aws.aws._create_secrets_client"
+TARGET_SECRETS_CLIENT = "pydantic_settings_aws.aws._create_boto3_client"
 
-TARGET_SSM_CLIENT = "pydantic_settings_aws.aws._create_ssm_client"
+TARGET_CREATE_CLIENT_FROM_SETTINGS = "pydantic_settings_aws.aws._create_client_from_settings"
 
 TARGET_SECRET_CONTENT = "pydantic_settings_aws.aws._get_secrets_content"
 
