@@ -19,3 +19,18 @@ class AwsSession(BaseModel):
     aws_access_key_id: Optional[str] = None
     aws_secret_access_key: Optional[str] = None
     aws_session_token: Optional[str] = None
+
+    def session_key(self) -> str:
+        key = ""
+        for k in self.model_fields.keys():
+            # session token is too long
+            if k != "aws_session_token":
+                v = getattr(self, k)
+                if v:
+                    key += f"{v}_"
+                    print(key)
+
+        if not key:
+            key = "default"
+
+        return key.rstrip("_")

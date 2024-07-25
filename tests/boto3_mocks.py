@@ -20,6 +20,9 @@ class ClientMock:
         self.secret_bytes = secret_bytes
         self.ssm_value = ssm_value
 
+    def client(self, *args):
+        return self
+
     def get_parameter(self, Name=None, WithDecryption=None):
         return {
             "Parameter": {
