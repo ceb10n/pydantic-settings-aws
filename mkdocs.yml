@@ -54,9 +54,11 @@ markdown_extensions:
 nav:
   - Pydantic Settings AWS Docs: index.md
   - Configuration:
+    - AWS: configuration/aws.md
     - Parameter Store: configuration/parameter-store.md
     - Secrets Manager: configuration/secrets-manager.md
   - Examples:
+    - AWS: examples/aws.md
     - Parameter Store: examples/parameter-store.md
     - Secrets Manager: examples/secrets-manager.md
   - Reference: reference.md
