@@ -130,6 +130,7 @@ def _create_client_from_settings(  # type: ignore[no-untyped-def]
     client = settings.model_config.get(client_param)
 
     if client:
+        logger.debug(f"Will use client from model config {client_param}")
         return client
 
     logger.debug("Extracting settings prefixed with aws_")
