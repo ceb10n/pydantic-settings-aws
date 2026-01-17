@@ -1,3 +1,7 @@
+# not migrated to uv yet
+uv.lock
+.python-version
+
 .ruff_cache
 .idea
 .ipynb_checkpoints
