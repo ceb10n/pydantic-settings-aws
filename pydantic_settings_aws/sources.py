@@ -41,8 +41,6 @@ class AWSSettingsSource(PydanticBaseSettingsSource):
             json_content = aws.get_secrets_content(self.settings_cls)
             field_value = json_content.get(field_name)
 
-        logger.info(f"field value={field_value}")
-
         return field_value, field_name, False
 
     def prepare_field_value(
