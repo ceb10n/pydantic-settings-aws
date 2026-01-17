@@ -1,3 +1,5 @@
+import sys
+import warnings
 from typing import Any, Dict, Tuple, Type
 
 from pydantic.fields import FieldInfo
@@ -10,9 +12,32 @@ from pydantic_settings_aws import aws, utils
 from pydantic_settings_aws.logger import logger
 
 
+class PythonVersionDeprecationWarning(UserWarning):
+    """Warning for deprecated Python versions."""
+    pass
+
+
+_warned = False
+
+
+def log_py_version_deprecation_warning() -> None:
+    global _warned
+    if _warned:
+        return
+
+    if sys.version_info < (3, 10):
+        warnings.warn(
+            "pydantic-settings-aws will drop support for Python 3.8 and 3.9 in version 0.2.0",
+            category=PythonVersionDeprecationWarning,
+            stacklevel=2
+        )
+        _warned = True
+
+
 class AWSSettingsSource(PydanticBaseSettingsSource):
     def __init__(self, settings_cls: Type[BaseSettings]):
         super().__init__(settings_cls)
+        log_py_version_deprecation_warning()
 
     def get_field_value(
         self, field: FieldInfo, field_name: str
@@ -73,6 +98,7 @@ class ParameterStoreSettingsSource(PydanticBaseSettingsSource):
 
     def __init__(self, settings_cls: Type[BaseSettings]):
         super().__init__(settings_cls)
+        log_py_version_deprecation_warning()
 
     def get_field_value(
         self, field: FieldInfo, field_name: str
@@ -113,6 +139,7 @@ class SecretsManagerSettingsSource(PydanticBaseSettingsSource):
     def __init__(self, settings_cls: Type[BaseSettings]):
         super().__init__(settings_cls)
         self._json_content = aws.get_secrets_content(settings_cls)
+        log_py_version_deprecation_warning()
 
     def get_field_value(
         self, field: FieldInfo, field_name: str
