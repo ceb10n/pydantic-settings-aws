@@ -11,7 +11,7 @@ The only required setting is your secret's name. All other configurations you ca
 
 ```py linenums="1"
 class ParameterStoreSettings(AWSBaseSettings):
-    model_config = SettingsConfigDict(
+    model_config = AWSSettingsConfigDict(
         secrets_name="my/secret"
     )
 

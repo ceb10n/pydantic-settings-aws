@@ -2,7 +2,7 @@
 
 You can use `pydantic-settings-aws` to create your settings with data located both in [Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html) and [Secrets Manager](https://aws.amazon.com/secrets-manager/).
 
-## :fontawesome-solid-screwdriver-wrench: SettingsConfigDict options
+## :fontawesome-solid-screwdriver-wrench: AWSSettingsConfigDict options
 
 You need to inform at least the Secrets Manager name, if you are using it as a data source.
 
@@ -27,7 +27,7 @@ When you are using `AWSBaseSettings` you need to add at least a `dict` with the 
 
 ```py linenums="1"
 class MongoDBSettings(AWSBaseSettings):
-    model_config = SettingsConfigDict(
+    model_config = AWSSettingsConfigDict(
         secrets_client=my_secrets_client,
         secrets_name="myservice/mongodb",
         ssm_client=my_ssm_client
@@ -45,13 +45,13 @@ At the moment you can only have one Secrets Manager source, but multiple paramet
 
 ```py linenums="1"
 class MongoDBSettings(AWSBaseSettings):
-    model_config = SettingsConfigDict(
+    model_config = AWSSettingsConfigDict(
         secrets_client=my_secrets_client,
         secrets_name="myservice/mongodb"
     )
 
-    username: Annotated[str, {"service": "secrets"}] # will use SettingsConfigDict
-    password: Annotated[str, {"service": "secrets"}] # will use SettingsConfigDict
+    username: Annotated[str, {"service": "secrets"}] # will use AWSSettingsConfigDict
+    password: Annotated[str, {"service": "secrets"}] # will use AWSSettingsConfigDict
     host: Annotated[str, {"ssm": "/dev/virginia/databases/mongodb/host", "ssm_client": dev_virginia_client}] # will use dev_virginia_client
     port: Annotated[str, {"ssm": "/dev/saopaulo/databases/mongodb/host", "ssm_client": dev_saopaulo_client}] # will use dev_saopaulo_client
 ```

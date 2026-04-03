@@ -35,11 +35,11 @@ Using pydantic-settings-aws can be as easy as:
 
     ```py title="settings.py" linenums="1"
     # import pydantic_settings_aws
-    from pydantic_settings_aws import SecretsManagerBaseSettings
+    from pydantic_settings_aws import AWSSettingsConfigDict, SecretsManagerBaseSettings
 
 
     class AWSSecretsSettings(SecretsManagerBaseSettings):
-        model_config = SettingsConfigDict(
+        model_config = AWSSettingsConfigDict(
             secrets_name="my/secret" # just put your secrets manager name
         )
 
@@ -54,13 +54,13 @@ Using pydantic-settings-aws can be as easy as:
 
     ```py title="settings.py" linenums="1"
     import boto3
-    from pydantic_settings_aws import SecretsManagerBaseSettings
+    from pydantic_settings_aws import AWSSettingsConfigDict, SecretsManagerBaseSettings
 
     client = boto3.client("secretsmanager")
 
 
     class AWSSecretsSettings(SecretsManagerBaseSettings):
-        model_config = SettingsConfigDict(
+        model_config = AWSSettingsConfigDict(
             secrets_name="my/secret", # just put your secrets manager name
             secrets_client=client # pass your already created boto3 client
         )
@@ -76,11 +76,11 @@ Using pydantic-settings-aws can be as easy as:
 === "with profile"
 
     ```py title="settings.py" linenums="1"
-    from pydantic_settings_aws import SecretsManagerBaseSettings
+    from pydantic_settings_aws import AWSSettingsConfigDict, SecretsManagerBaseSettings
 
 
     class AWSSecretsSettings(SecretsManagerBaseSettings):
-        model_config = SettingsConfigDict(
+        model_config = AWSSettingsConfigDict(
             aws_region="us-east-1",
             aws_profile="dev"
         )

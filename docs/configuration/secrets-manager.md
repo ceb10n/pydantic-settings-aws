@@ -5,7 +5,7 @@ You can use `pydantic-settings-aws` to create your settings with data located in
 !!! info "Secrets Manager content"
     The content of the Secrets Manager **must** be a valid JSON.
 
-## :fontawesome-solid-screwdriver-wrench: SettingsConfigDict options
+## :fontawesome-solid-screwdriver-wrench: AWSSettingsConfigDict options
 
 There is only one required setting that you must especify: `secrets_name`.
 

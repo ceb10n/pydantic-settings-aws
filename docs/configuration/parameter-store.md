@@ -5,7 +5,7 @@ You can use `pydantic-settings-aws` to create your settings with data located in
 !!! info "Parameter Store content"
     The content of the the parameter store **must** be a `string`.
 
-## :fontawesome-solid-screwdriver-wrench: SettingsConfigDict options
+## :fontawesome-solid-screwdriver-wrench: AWSSettingsConfigDict options
 
 There is no required setting that you must especify.
 
@@ -30,7 +30,7 @@ In case all your parameters are in the same AWS account and region, you can just
 
 ```py linenums="1"
 class MongoDBSettings(ParameterStoreBaseSettings):
-    model_config = SettingsConfigDict(
+    model_config = AWSSettingsConfigDict(
         ssm_client=my_ssm_client
     )
 

@@ -9,7 +9,7 @@ The simplest way you can work with `ParameterStoreBaseSettings` is to leaving it
 
 ```py linenums="1"
 class ParameterStoreSettings(ParameterStoreBaseSettings):
-    # no SettingsConfigDict
+    # no AWSSettingsConfigDict
 
     mongodb_host: str
     mongodb_db_name: str
@@ -29,7 +29,7 @@ To deal with these cases, you must use `Annotated` and add the name of your para
 
 ```py linenums="1"
 class DynamoDBSettings(ParameterStoreBaseSettings):
-    model_config = SettingsConfigDict(
+    model_config = AWSSettingsConfigDict(
         ssm_client=my_ssm_client
     )
 

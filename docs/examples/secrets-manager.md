@@ -6,17 +6,17 @@ For more information about all the options and settings, refer to [Configuring S
 
 You can use an already created `boto3 client`.
 
-All you need to do is to add `secrets_client` to your `SettingsConfigDict`.
+All you need to do is to add `secrets_client` to your `AWSSettingsConfigDict`.
 
 ```py linenums="1"
 import boto3
-from pydantic_settings_aws import SecretsManagerBaseSettings
+from pydantic_settings_aws import AWSSettingsConfigDict, SecretsManagerBaseSettings
 
 client = boto3.client("secretsmanager")
 
 
 class AWSSecretsSettings(SecretsManagerBaseSettings):
-    model_config = SettingsConfigDict(
+    model_config = AWSSettingsConfigDict(
         secrets_name="my/secret",
         secrets_client=client
     )
@@ -43,10 +43,10 @@ settings = AWSSecretsSettings()
 ## :fontawesome-solid-toolbox: Getting specific version and stage of the secret
 
 ```py linenums="1"
-from pydantic_settings_aws import SecretsManagerBaseSettings
+from pydantic_settings_aws import AWSSettingsConfigDict, SecretsManagerBaseSettings
 
 class AWSSecretsSettings(SecretsManagerBaseSettings):
-    model_config = SettingsConfigDict(
+    model_config = AWSSettingsConfigDict(
         secrets_name="my/secret",
         secrets_version="2",
         secrets_stage="AWSCURRENT"
@@ -59,10 +59,10 @@ class AWSSecretsSettings(SecretsManagerBaseSettings):
 ## :fontawesome-solid-id-card: With AWS profile name
 
 ```py linenums="1"
-from pydantic_settings_aws import SecretsManagerBaseSettings
+from pydantic_settings_aws import AWSSettingsConfigDict, SecretsManagerBaseSettings
 
 class AWSSecretsSettings(SecretsManagerBaseSettings):
-    model_config = SettingsConfigDict(
+    model_config = AWSSettingsConfigDict(
         secrets_name="my/secret",
         aws_profile="DEV",
         aws_region="sa-east-1"
@@ -75,10 +75,10 @@ class AWSSecretsSettings(SecretsManagerBaseSettings):
 ## :fontawesome-solid-gears: With access key
 
 ```py linenums="1"
-from pydantic_settings_aws import SecretsManagerBaseSettings
+from pydantic_settings_aws import AWSSettingsConfigDict, SecretsManagerBaseSettings
 
 class AWSSecretsSettings(SecretsManagerBaseSettings):
-    model_config = SettingsConfigDict(
+    model_config = AWSSettingsConfigDict(
         secrets_name="my/secret",
         aws_region="us-east-1",
         aws_access_key_id="my_aws_access_key_id",
@@ -102,10 +102,10 @@ aws sso login --profile DEV
 And then you can leave all empty:
 
 ```py linenums="1"
-from pydantic_settings_aws import SecretsManagerBaseSettings
+from pydantic_settings_aws import AWSSettingsConfigDict, SecretsManagerBaseSettings
 
 class AWSSecretsSettings(SecretsManagerBaseSettings):
-    model_config = SettingsConfigDict(
+    model_config = AWSSettingsConfigDict(
         secrets_name="my/secret"
     )
 
