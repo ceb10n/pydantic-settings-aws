@@ -44,6 +44,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Set up Rust
+      uses: dtolnay/rust-toolchain@stable
+
     - name: set up python
       uses: actions/setup-python@v6
       with:
