@@ -25,14 +25,14 @@ To check how boto3 will look for your configurations, check [Configuring credent
 
 ```python
 import boto3
-from pydantic_settings_aws import SecretsManagerBaseSettings
+from pydantic_settings_aws import AWSAWSSettingsConfigDict, SecretsManagerBaseSettings
 
 
 client = boto3.client("secretsmanager")
 
 
 class AWSSecretsSettings(SecretsManagerBaseSettings):
-    model_config = SettingsConfigDict(
+    model_config = AWSSettingsConfigDict(
         secrets_name="my/secret",
         secrets_client=client
     )
@@ -57,8 +57,11 @@ And your secrets manager should be:
 ### 🙋🏾‍♂️ With profile name
 
 ```python
+from pydantic_settings_aws import AWSSettingsConfigDict, SecretsManagerBaseSettings
+
+
 class AWSSecretsSettings(SecretsManagerBaseSettings):
-    model_config = SettingsConfigDict(
+    model_config = AWSSettingsConfigDict(
         secrets_name="my/secret",
         aws_region="us-east-1",
         aws_profile="dev"
@@ -71,8 +74,11 @@ class AWSSecretsSettings(SecretsManagerBaseSettings):
 ### 🔑 With access key
 
 ```python
+from pydantic_settings_aws import AWSSettingsConfigDict, SecretsManagerBaseSettings
+
+
 class AWSSecretsSettings(SecretsManagerBaseSettings):
-    model_config = SettingsConfigDict(
+    model_config = AWSSettingsConfigDict(
         secrets_name="my/secret",
         aws_region="us-east-1",
         aws_access_key_id="aws_access_key_id",
@@ -91,8 +97,11 @@ aws sso login --profile my-profile
 ```
 
 ```python
+from pydantic_settings_aws import AWSSettingsConfigDict, SecretsManagerBaseSettings
+
+
 class AWSSecretsSettings(SecretsManagerBaseSettings):
-    model_config = SettingsConfigDict(
+    model_config = AWSSettingsConfigDict(
         secrets_name="my/secret"
     )
 
