@@ -74,7 +74,7 @@ def get_secrets_content(settings: Type[BaseSettings]) -> Dict[str, Any]:
         logger.error(
             f"The content of the secrets manager must be a valid json: {json_err}"
         )
-        raise json_err
+        raise
 
 
 def _get_secrets_args(settings: Type[BaseSettings]) -> AwsSecretsArgs:
@@ -95,7 +95,7 @@ def _get_secrets_args(settings: Type[BaseSettings]) -> AwsSecretsArgs:
         logger.error(
             f"A validation error was caught. Please check all required fields: {err}"
         )
-        raise err
+        raise
 
 
 def _get_secrets_content(
