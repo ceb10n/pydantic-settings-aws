@@ -7,14 +7,14 @@ path = 'pydantic_settings_aws/version.py'
 
 [project]
 name = 'pydantic-settings-aws'
-description = 'Settings management using AWS Secrets Manager and Pydantic'
+description = 'Load Pydantic v2 settings from AWS Secrets Manager and SSM Parameter Store'
 authors = [
     { name = 'Rafael de Oliveira Marques', email = 'rafaelomarques@gmail.com' },
 ]
 license = 'MIT'
-readme = 'README.md'
+readme = { file = "README.md", content-type = "text/markdown" }
 classifiers = [
-    'Development Status :: 3 - Alpha',
+    'Development Status :: 5 - Production/Stable',
     'Programming Language :: Python',
     'Programming Language :: Python :: 3',
     'Programming Language :: Python :: 3 :: Only',
@@ -32,23 +32,46 @@ classifiers = [
     'Operating System :: MacOS',
     'Operating System :: Microsoft',
     'Environment :: Console',
+    'Topic :: System :: Systems Administration',
     'Topic :: Software Development :: Libraries :: Python Modules',
+    'Topic :: Software Development :: Libraries :: Application Frameworks',
     'Topic :: Internet',
+    'Typing :: Typed',
+    'Framework :: Pydantic',
+]
+keywords = [
+    "pydantic",
+    "pydantic-settings",
+    "pydantic aws",
+    "aws",
+    "aws secrets manager",
+    "aws secrets manager python",
+    "ssm",
+    "ssm parameter store",
+    "parameter store python",
+    "aws configuration",
+    "python configuration aws",
+    "fastapi",
+    "typed configuration",
+    "secrets management",
+    "configuration management",
 ]
 requires-python = '>=3.10'
 dependencies = [
     'pydantic>=2.12.0,<3.0.0',
-    'pydantic-settings>=2.0.2',
-    'boto3>=1.27.0'
+    'pydantic-settings>=2.0.2,<3.0.0',
+    'boto3>=1.27.0,<2.0.0'
 ]
 dynamic = ['version']
 
 [project.urls]
 Homepage = "https://github.com/ceb10n/pydantic-settings-aws"
-Documentation = "https://ceb10n.github.io/pydantic-settings-aws/"
+Documentation = "https://ceb10n.github.io/pydantic-settings-aws"
 Repository = "https://github.com/ceb10n/pydantic-settings-aws"
+Issues = "https://github.com/ceb10n/pydantic-settings-aws/issues"
+Changelog = "https://github.com/ceb10n/pydantic-settings-aws/releases"
 
-[dependency-groups]
+[project.optional-dependencies]
 dev = [
     "black>=26.3.1",
     "mypy>=1.20.0",
@@ -56,6 +79,12 @@ dev = [
     "pytest>=9.0.2",
     "pytest-cov>=7.1.0",
     "ruff>=0.15.9",
+]
+docs = [
+    "mkdocs>=1.6.0",
+    "mkdocstrings[python]>=0.25.1",
+    "mkdocs-material>=9.5.29",
+    "mkdocs-git-committers-plugin-2>=2.3.0",
 ]
 
 [tool.pytest.ini_options]
@@ -81,7 +110,7 @@ precision = 2
 source = ['pydantic_settings_aws/']
 
 [tool.ruff]
-line-length = 80
+line-length = 88
 target-version = 'py310'
 
 [tool.ruff.lint]
