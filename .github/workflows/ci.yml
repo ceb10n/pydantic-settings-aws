@@ -8,10 +8,14 @@ on:
       - '**'
   pull_request: {}
 
+permissions: read-all
+
 jobs:
   lint:
     runs-on: ubuntu-latest
     name: Lint
+    permissions:
+      contents: read
     steps:
     - name: checkout
       uses: actions/checkout@v6
@@ -40,6 +44,9 @@ jobs:
       OS: ${{ matrix.os }}
 
     runs-on: ${{ matrix.os }}
+
+    permissions:
+      contents: read
 
     steps:
     - uses: actions/checkout@v6
@@ -74,6 +81,7 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
+      contents: read
       id-token: write
 
     steps:
