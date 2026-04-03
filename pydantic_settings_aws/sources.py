@@ -1,6 +1,6 @@
 import sys
 import warnings
-from typing import Any, Dict, Tuple, Type
+from typing import Any
 
 from pydantic.fields import FieldInfo
 from pydantic_settings import (
@@ -25,9 +25,9 @@ def log_py_version_deprecation_warning() -> None:
     if _warned:
         return
 
-    if sys.version_info < (3, 10):
+    if sys.version_info < (3, 11):
         warnings.warn(
-            "pydantic-settings-aws will drop support for Python 3.8 and 3.9 in version 0.2.0",
+            "pydantic-settings-aws will drop support for Python 3.10 after 2026-10",
             category=PythonVersionDeprecationWarning,
             stacklevel=2
         )
@@ -35,13 +35,13 @@ def log_py_version_deprecation_warning() -> None:
 
 
 class AWSSettingsSource(PydanticBaseSettingsSource):
-    def __init__(self, settings_cls: Type[BaseSettings]):
+    def __init__(self, settings_cls: type[BaseSettings]):
         super().__init__(settings_cls)
         log_py_version_deprecation_warning()
 
     def get_field_value(
         self, field: FieldInfo, field_name: str
-    ) -> Tuple[Any, str, bool]:
+    ) -> tuple[Any, str, bool]:
         logger.debug(f"Getting {field_name} value from AWS service")
         field_value = None
 
@@ -77,8 +77,8 @@ class AWSSettingsSource(PydanticBaseSettingsSource):
     ) -> Any:
         return value
 
-    def __call__(self) -> Dict[str, Any]:
-        d: Dict[str, Any] = {}
+    def __call__(self) -> dict[str, Any]:
+        d: dict[str, Any] = {}
 
         for field_name, field in self.settings_cls.model_fields.items():
             field_value, field_key, value_is_complex = self.get_field_value(
@@ -96,13 +96,13 @@ class AWSSettingsSource(PydanticBaseSettingsSource):
 class ParameterStoreSettingsSource(PydanticBaseSettingsSource):
     """Source class for loading settings from AWS Parameter Store."""
 
-    def __init__(self, settings_cls: Type[BaseSettings]):
+    def __init__(self, settings_cls: type[BaseSettings]):
         super().__init__(settings_cls)
         log_py_version_deprecation_warning()
 
     def get_field_value(
         self, field: FieldInfo, field_name: str
-    ) -> Tuple[Any, str, bool]:
+    ) -> tuple[Any, str, bool]:
         ssm_info = utils.get_ssm_name_from_annotated_field(field.metadata)
         field_value = aws.get_ssm_content(
             self.settings_cls, field_name, ssm_info
@@ -119,8 +119,8 @@ class ParameterStoreSettingsSource(PydanticBaseSettingsSource):
     ) -> Any:
         return value
 
-    def __call__(self) -> Dict[str, Any]:
-        d: Dict[str, Any] = {}
+    def __call__(self) -> dict[str, Any]:
+        d: dict[str, Any] = {}
 
         for field_name, field in self.settings_cls.model_fields.items():
             field_value, field_key, value_is_complex = self.get_field_value(
@@ -136,14 +136,14 @@ class ParameterStoreSettingsSource(PydanticBaseSettingsSource):
 
 
 class SecretsManagerSettingsSource(PydanticBaseSettingsSource):
-    def __init__(self, settings_cls: Type[BaseSettings]):
+    def __init__(self, settings_cls: type[BaseSettings]):
         super().__init__(settings_cls)
         self._json_content = aws.get_secrets_content(settings_cls)
         log_py_version_deprecation_warning()
 
     def get_field_value(
         self, field: FieldInfo, field_name: str
-    ) -> Tuple[Any, str, bool]:
+    ) -> tuple[Any, str, bool]:
         field_value = self._json_content.get(field_name)
         return field_value, field_name, False
 
@@ -156,8 +156,8 @@ class SecretsManagerSettingsSource(PydanticBaseSettingsSource):
     ) -> Any:
         return value
 
-    def __call__(self) -> Dict[str, Any]:
-        d: Dict[str, Any] = {}
+    def __call__(self) -> dict[str, Any]:
+        d: dict[str, Any] = {}
 
         for field_name, field in self.settings_cls.model_fields.items():
             field_value, field_key, value_is_complex = self.get_field_value(

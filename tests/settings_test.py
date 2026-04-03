@@ -14,15 +14,15 @@ from .settings_mocks import (
 )
 
 
-def test_secrets_settings_with_basic_secrets_content():
-    my_config = MySecretsWithClientConfig()
+def test_secrets_settings_with_basic_secrets_content() -> None:
+    my_config = MySecretsWithClientConfig()  # type: ignore[call-arg]
 
     assert my_config is not None
     assert my_config.username == "myusername"
 
 
-def test_secrets_settings_with_nested_secrets_content():
-    my_config = SecretsWithNestedContent()
+def test_secrets_settings_with_nested_secrets_content() -> None:
+    my_config = SecretsWithNestedContent()  # type: ignore[call-arg]
 
     assert my_config is not None
     assert my_config.username == "myusername"
@@ -30,16 +30,16 @@ def test_secrets_settings_with_nested_secrets_content():
     assert len(my_config.nested.roles) > 0
 
 
-def test_ssm_with_annotated_str():
-    my_config = ParameterSettings()
+def test_ssm_with_annotated_str() -> None:
+    my_config = ParameterSettings()  # type: ignore[call-arg]
 
     assert my_config is not None
     assert my_config.my_ssm is not None
     assert isinstance(my_config.my_ssm, str)
 
 
-def test_ssm_with_and_without_ssm_client():
-    my_config = ParameterWithTwoSSMClientSettings()
+def test_ssm_with_and_without_ssm_client() -> None:
+    my_config = ParameterWithTwoSSMClientSettings()  # type: ignore[call-arg]
 
     assert my_config is not None
     assert my_config.my_ssm is not None
@@ -49,15 +49,15 @@ def test_ssm_with_and_without_ssm_client():
     assert isinstance(my_config.my_ssm_2, str)
 
 
-def test_ssm_with_none_in_optional_values():
+def test_ssm_with_none_in_optional_values() -> None:
     my_config = ParameterWithOptionalValueSettings()
 
     assert my_config is not None
     assert my_config.my_ssm is None
 
 
-def test_aws_with_secrets_and_parameters():
-    my_config = AWSWithParameterAndSecretsWithDefaultBoto3Client()
+def test_aws_with_secrets_and_parameters() -> None:
+    my_config = AWSWithParameterAndSecretsWithDefaultBoto3Client()  # type: ignore[call-arg]
 
     assert my_config is not None
     assert (
@@ -71,10 +71,10 @@ def test_aws_with_secrets_and_parameters():
     assert my_config.host is not None
 
 
-def test_aws_settings_should_get_value_from_environment_if_not_found_in_ssm_or_secrets():
+def test_aws_settings_should_get_value_from_environment_if_not_found_in_ssm_or_secrets() -> None:
     os.environ["server_name"] = "test-server"
 
-    my_config = AWSWithParameterSecretsAndEnvironmentWithDefaultBoto3Client()
+    my_config = AWSWithParameterSecretsAndEnvironmentWithDefaultBoto3Client()  # type: ignore[call-arg]
     assert my_config is not None
     assert my_config.username is not None
     assert my_config.password is not None
@@ -82,13 +82,13 @@ def test_aws_settings_should_get_value_from_environment_if_not_found_in_ssm_or_s
     assert my_config.server_name == "test-server"
 
 
-def test_aws_settings_should_ignore_value_if_service_is_unknown():
+def test_aws_settings_should_ignore_value_if_service_is_unknown() -> None:
     my_config = AWSWithUnknownService()
     assert my_config is not None
     assert my_config.my_name is None
 
 
-def test_aws_settings_should_ignore_value_if_metadata_is_not_a_dict():
+def test_aws_settings_should_ignore_value_if_metadata_is_not_a_dict() -> None:
     my_config = AWSWithNonDictMetadata()
     assert my_config is not None
     assert my_config.my_name is None
