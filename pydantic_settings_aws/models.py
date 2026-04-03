@@ -20,7 +20,7 @@ class AwsSession(BaseModel):
 
     def session_key(self) -> str:
         key = ""
-        for k in self.model_fields.keys():
+        for k in self.__class__.model_fields.keys():
             # session token is too long
             if k != "aws_session_token":
                 v = getattr(self, k)
