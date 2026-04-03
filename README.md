@@ -1,5 +1,11 @@
 # Pydantic Settings AWS
 
+<p align="center">
+  <img src="docs/assets/logo.png" alt="pydantic-settings-aws logo" width="400"/>
+</p>
+
+<br/>
+
 [![CI](https://github.com/ceb10n/pydantic-settings-aws/actions/workflows/ci.yml/badge.svg)](https://github.com/ceb10n/pydantic-settings-aws/actions)
 [![codecov](https://codecov.io/github/ceb10n/pydantic-settings-aws/graph/badge.svg?token=K77HYDZR3P)](https://codecov.io/github/ceb10n/pydantic-settings-aws)
 [![PyPI - Implementation](https://img.shields.io/pypi/implementation/pydantic-settings-aws)](https://pypi.org/project/pydantic-settings-aws)
