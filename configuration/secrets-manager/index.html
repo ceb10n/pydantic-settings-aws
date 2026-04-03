@@ -568,6 +568,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#thread-safety" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Thread Safety
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -817,6 +828,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#thread-safety" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Thread Safety
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -897,7 +919,7 @@
 <p>The content of the Secrets Manager <strong>must</strong> be a valid JSON.</p>
 </div>
 <h2 id="awssettingsconfigdict-options"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M70.8-6.7c5.4-5.4 13.8-6.2 20.2-2l118.9 79.2c8.9 5.9 14.2 15.9 14.2 26.6v49.6l90.8 90.8c33.3-15 73.9-8.9 101.2 18.5l126.1 126.1c18.7 18.7 18.7 49.1 0 67.9l-60.1 60.1c-18.7 18.7-49.1 18.7-67.9 0L288.1 384c-27.4-27.4-33.5-67.9-18.5-101.2L178.8 192h-49.6c-10.7 0-20.7-5.3-26.6-14.2L23.4 58.9c-4.2-6.3-3.4-14.8 2-20.2zm145 303.5c-6.3 36.9 2.3 75.9 26.2 107.2l-94.9 95c-28.1 28.1-73.7 28.1-101.8 0s-28.1-73.7 0-101.8l135.4-135.5 35.2 35.1zM384.1 0c20.1 0 39.4 3.7 57.1 10.5 10 3.8 11.8 16.5 4.3 24.1l-56.7 56.7c-3 3-4.7 7.1-4.7 11.3V144c0 8.8 7.2 16 16 16h41.4c4.2 0 8.3-1.7 11.3-4.7l56.7-56.7c7.6-7.5 20.3-5.7 24.1 4.3 6.8 17.7 10.5 37 10.5 57.1 0 43.2-17.2 82.3-45 111.1L450 222c-33.1-33-78.5-45.7-121.1-38.4l-56.8-56.8V97.1l-.2-5c-.8-12.4-4.4-24.3-10.5-34.9C290.8 22.2 334.8 0 384.1-.1z"/></svg></span> AWSSettingsConfigDict options</h2>
-<p>There is only one required setting that you must especify: <code>secrets_name</code>.</p>
+<p>There is only one required setting that you must specify: <code>secrets_name</code>.</p>
 <h3 id="settings-for-boto3-client-usage"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M176 56v40h160V56c0-4.4-3.6-8-8-8H184c-4.4 0-8 3.6-8 8m-48 40V56c0-30.9 25.1-56 56-56h144c30.9 0 56 25.1 56 56v40h28.1c12.7 0 24.9 5.1 33.9 14.1l51.9 51.9c9 9 14.1 21.2 14.1 33.9V272H376v-16c0-13.3-10.7-24-24-24s-24 10.7-24 24v16H184v-16c0-13.3-10.7-24-24-24s-24 10.7-24 24v16H0v-76.1C0 183.2 5.1 171 14.1 162L66 110.1c9-9 21.2-14.1 33.9-14.1zM0 416v-96h136v16c0 13.3 10.7 24 24 24s24-10.7 24-24v-16h144v16c0 13.3 10.7 24 24 24s24-10.7 24-24v-16h136v96c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64"/></svg></span> Settings for boto3 client usage</h3>
 <table>
 <thead>
@@ -967,6 +989,16 @@
 </tr>
 </tbody>
 </table>
+<div class="admonition warning">
+<p class="admonition-title">Single secret per settings class</p>
+<p><code>SecretsManagerBaseSettings</code> supports only one secret per settings class. If you need values from multiple secrets, use separate settings classes or use <code>AWSBaseSettings</code> with per-field <code>Annotated</code> metadata.</p>
+</div>
+<h2 id="thread-safety"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M128 96v64h128V96c0-35.3-28.7-64-64-64s-64 28.7-64 64m-64 64V96c0-70.7 57.3-128 128-128S320 25.3 320 96v64c35.3 0 64 28.7 64 64v224c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V224c0-35.3 28.7-64 64-64"/></svg></span> Thread Safety</h2>
+<p>The boto3 client cache is thread-safe. A <code>threading.Lock</code> protects all cache reads and writes, making <code>SecretsManagerBaseSettings</code> safe to instantiate from multiple threads simultaneously — including free-threaded Python builds (<code>3.13t</code>, <code>3.14t</code>).</p>
+<div class="admonition info">
+<p class="admonition-title">Requirements</p>
+<p>Requires <strong>Python 3.10+</strong>.</p>
+</div>
 
 
 
