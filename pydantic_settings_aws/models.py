@@ -28,7 +28,6 @@ class AwsSession(BaseModel):
                 v = getattr(self, k)
                 if v:
                     key += f"{v}_"
-                    print(key)
 
         if not key:
             key = "default"
