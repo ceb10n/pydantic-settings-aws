@@ -7,7 +7,7 @@ You can use `pydantic-settings-aws` to create your settings with data located in
 
 ## :fontawesome-solid-screwdriver-wrench: AWSSettingsConfigDict options
 
-There is only one required setting that you must especify: `secrets_name`.
+There is only one required setting that you must specify: `secrets_name`.
 
 ### :fontawesome-solid-toolbox: Settings for boto3 client usage
 
@@ -27,3 +27,13 @@ There is only one required setting that you must especify: `secrets_name`.
 | `secrets_name`    | :fontawesome-solid-triangle-exclamation: required | The name of your Secrets Manager |
 | `secrets_version` | :fontawesome-solid-xmark: optional                | The version of your secret       |
 | `secrets_stage`   | :fontawesome-solid-xmark: optional                | The stage of your secret         |
+
+!!! warning "Single secret per settings class"
+    `SecretsManagerBaseSettings` supports only one secret per settings class. If you need values from multiple secrets, use separate settings classes or use `AWSBaseSettings` with per-field `Annotated` metadata.
+
+## :fontawesome-solid-lock: Thread Safety
+
+The boto3 client cache is thread-safe. A `threading.Lock` protects all cache reads and writes, making `SecretsManagerBaseSettings` safe to instantiate from multiple threads simultaneously — including free-threaded Python builds (`3.13t`, `3.14t`).
+
+!!! info "Requirements"
+    Requires **Python 3.10+**.

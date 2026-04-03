@@ -66,3 +66,10 @@ If it can't find a value, `AWSBaseSettings` will still try to get your informati
 * Environment variables
 * dotenv files
 * secret files
+
+## :fontawesome-solid-lock: Thread Safety
+
+The boto3 client cache is thread-safe. A `threading.Lock` protects all cache reads and writes, making it safe to use `AWSBaseSettings` from multiple threads simultaneously — including free-threaded Python builds (`3.13t`, `3.14t`).
+
+!!! info "Requirements"
+    Requires **Python 3.10+**.
