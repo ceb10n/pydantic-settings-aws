@@ -93,7 +93,7 @@ def _get_secrets_args(settings: Type[BaseSettings]) -> AwsSecretsArgs:
 
     except ValidationError as err:
         logger.error(
-            f"A validation error was caugth. Please, check all required fields: {err}"
+            f"A validation error was caught. Please check all required fields: {err}"
         )
         raise err
 
