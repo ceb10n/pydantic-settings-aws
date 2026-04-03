@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- README: logo, quick start section, why section, SSM Parameter Store example, uv installation instructions, features and requirements sections
+- `CHANGELOG.md` with full history from initial release
+- `Framework :: Pydantic` and `Typing :: Typed` classifiers
+- `keywords` field in pyproject.toml for improved PyPI discoverability
+- `docs` optional dependency group in pyproject.toml (`pip install pydantic-settings-aws[docs]`)
+- `Issues` and `Changelog` URLs in pyproject.toml
+- `content-type = "text/markdown"` on readme declaration
+
+### Changed
+- Improved project description in pyproject.toml
+- `Development Status` classifier updated to `5 - Production/Stable`
+- Pinned `pydantic-settings < 3.0.0` and `boto3 < 2.0.0`
+- Moved dev dependencies from `[dependency-groups]` to `[project.optional-dependencies]`
+- Docs workflow now installs dependencies via `pip install ".[docs]"`
+- All documentation and README updated to reference `AWSSettingsConfigDict` instead of `SettingsConfigDict`
+
 ## [1.0.0b1] - 2026-04-03
 
 ### Added

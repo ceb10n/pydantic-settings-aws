@@ -7,7 +7,7 @@ You can use `pydantic-settings-aws` to create your settings with data located in
 
 ## :fontawesome-solid-screwdriver-wrench: AWSSettingsConfigDict options
 
-There is no required setting that you must especify.
+There is no required setting that you must specify.
 
 ### :fontawesome-solid-toolbox: Settings for boto3 client usage
 
@@ -48,3 +48,10 @@ class MongoDBSettings(ParameterStoreBaseSettings):
     release_host: Annotated[str, {"ssm": "/release/databases/mongodb/host", "ssm_client": release_client}]
     development_host: Annotated[str, {"ssm": "/development/databases/mongodb/host", "ssm_client": development_client}]
 ```
+
+## :fontawesome-solid-lock: Thread Safety
+
+The boto3 client cache is thread-safe. A `threading.Lock` protects all cache reads and writes, making `ParameterStoreBaseSettings` safe to instantiate from multiple threads simultaneously — including free-threaded Python builds (`3.13t`, `3.14t`).
+
+!!! info "Requirements"
+    Requires **Python 3.10+**.

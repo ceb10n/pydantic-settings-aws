@@ -10,6 +10,10 @@ The only restriction if for Secrets Manager. You can only use one *secret / clie
 The only required setting is your secret's name. All other configurations you can leave to boto3 to deal.
 
 ```py linenums="1"
+from typing import Annotated
+from pydantic_settings_aws import AWSBaseSettings, AWSSettingsConfigDict
+
+
 class ParameterStoreSettings(AWSBaseSettings):
     model_config = AWSSettingsConfigDict(
         secrets_name="my/secret"

@@ -8,6 +8,9 @@ When working with `ParameterStoreBaseSettings`, you can work with parameters liv
 The simplest way you can work with `ParameterStoreBaseSettings` is to leaving it all to boto3 and create your fields with the same name as your parameters:
 
 ```py linenums="1"
+from pydantic_settings_aws import ParameterStoreBaseSettings
+
+
 class ParameterStoreSettings(ParameterStoreBaseSettings):
     # no AWSSettingsConfigDict
 
@@ -28,6 +31,10 @@ For almost all cases, your parameter's name will be different from your field na
 To deal with these cases, you must use `Annotated` and add the name of your parameter:
 
 ```py linenums="1"
+from typing import Annotated
+from pydantic_settings_aws import AWSSettingsConfigDict, ParameterStoreBaseSettings
+
+
 class DynamoDBSettings(ParameterStoreBaseSettings):
     model_config = AWSSettingsConfigDict(
         ssm_client=my_ssm_client
@@ -48,6 +55,10 @@ If you need to work with multiple accounts or regions, you can use `Annotated` a
 ```
 
 ```py linenums="1"
+from typing import Annotated
+from pydantic_settings_aws import ParameterStoreBaseSettings
+
+
 class MongoDBSettings(ParameterStoreBaseSettings):
 
     prod_host: Annotated[str, {"ssm": "/prod/databases/mongodb/host", "ssm_client": prod_client}]
