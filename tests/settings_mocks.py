@@ -1,12 +1,11 @@
 import json
-from typing import List, Optional
+from typing import Annotated
 
 from pydantic import BaseModel
-from pydantic_settings import SettingsConfigDict
-from typing_extensions import Annotated
 
 from pydantic_settings_aws import (
     AWSBaseSettings,
+    AWSSettingsConfigDict,
     ParameterStoreBaseSettings,
     SecretsManagerBaseSettings,
 )
@@ -29,14 +28,14 @@ mock_secrets_with_username_and_pwd = ClientMock(
 
 
 class MySecretsWithClientConfig(SecretsManagerBaseSettings):
-    model_config = SettingsConfigDict(
+    model_config = AWSSettingsConfigDict(
         secrets_name="my/secret",
         secrets_client=mock_secrets_with_username_and_pwd,
     )
 
     username: str
     password: str
-    name: Optional[str] = None
+    name: str | None = None
 
 
 secrets_with_nested_content = json.dumps(
@@ -53,11 +52,11 @@ mock_secrets_with_nested_content = ClientMock(
 
 
 class NestedContent(BaseModel):
-    roles: List[str]
+    roles: list[str]
 
 
 class SecretsWithNestedContent(SecretsManagerBaseSettings):
-    model_config = SettingsConfigDict(
+    model_config = AWSSettingsConfigDict(
         secrets_name="my/secret",
         secrets_client=mock_secrets_with_nested_content,
     )
@@ -75,7 +74,7 @@ class ParameterSettings(ParameterStoreBaseSettings):
 
 
 class ParameterWithTwoSSMClientSettings(ParameterStoreBaseSettings):
-    model_config = SettingsConfigDict(ssm_client=ClientMock(ssm_value="value"))
+    model_config = AWSSettingsConfigDict(ssm_client=ClientMock(ssm_value="value"))
 
     my_ssm: Annotated[
         str,
@@ -89,13 +88,13 @@ class ParameterWithTwoSSMClientSettings(ParameterStoreBaseSettings):
 
 
 class ParameterWithOptionalValueSettings(ParameterStoreBaseSettings):
-    model_config = SettingsConfigDict(ssm_client=ClientMock())
+    model_config = AWSSettingsConfigDict(ssm_client=ClientMock())
 
-    my_ssm: Annotated[Optional[str], "my/ssm/2/parameter"] = None
+    my_ssm: Annotated[str | None, "my/ssm/2/parameter"] = None
 
 
 class AWSWithParameterAndSecretsWithDefaultBoto3Client(AWSBaseSettings):
-    model_config = SettingsConfigDict(
+    model_config = AWSSettingsConfigDict(
         ssm_client=ClientMock(ssm_value="value"),
         secrets_client=mock_secrets_with_username_and_pwd,
         secrets_name="my/secret",
@@ -107,7 +106,7 @@ class AWSWithParameterAndSecretsWithDefaultBoto3Client(AWSBaseSettings):
 
 
 class AWSWithParameterSecretsAndEnvironmentWithDefaultBoto3Client(AWSBaseSettings):
-    model_config = SettingsConfigDict(
+    model_config = AWSSettingsConfigDict(
         ssm_client=ClientMock(ssm_value="value"),
         secrets_client=mock_secrets_with_username_and_pwd,
         secrets_name="my/secret",
@@ -120,8 +119,8 @@ class AWSWithParameterSecretsAndEnvironmentWithDefaultBoto3Client(AWSBaseSetting
 
 
 class AWSWithUnknownService(AWSBaseSettings):
-    my_name: Annotated[Optional[str], {"service": "s3"}] = None
+    my_name: Annotated[str | None, {"service": "s3"}] = None
 
 
 class AWSWithNonDictMetadata(AWSBaseSettings):
-    my_name: Annotated[Optional[str], "my irrelevant metadata"] = None
+    my_name: Annotated[str | None, "my irrelevant metadata"] = None

@@ -1,3 +1,4 @@
+from .config import AWSSettingsConfigDict
 from .settings import (
     AWSBaseSettings,
     ParameterStoreBaseSettings,
@@ -7,6 +8,7 @@ from .version import VERSION
 
 __all__ = [
     "AWSBaseSettings",
+    "AWSSettingsConfigDict",
     "ParameterStoreBaseSettings",
     "SecretsManagerBaseSettings",
 ]
