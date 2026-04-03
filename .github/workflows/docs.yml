@@ -30,7 +30,7 @@ jobs:
           python-version: '3.10'
 
       - name: install deps
-        run: pip install -r requirements-docs.txt
+        run: pip install ".[docs]"
 
       - name: deploy docs
         run: mkdocs gh-deploy --force
