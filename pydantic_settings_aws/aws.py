@@ -1,4 +1,5 @@
 import json
+import threading
 from typing import Any, AnyStr, Literal
 
 import boto3  # type: ignore[import-untyped]
@@ -13,6 +14,7 @@ AWSService = Literal["ssm", "secretsmanager"]
 ClientParam = Literal["secrets_client", "ssm_client"]
 
 _client_cache: dict[str, Any] = {}
+_client_cache_lock = threading.Lock()
 
 
 def get_ssm_content(
@@ -158,14 +160,15 @@ def _create_boto3_client(session_args: AwsSession, service: AWSService):  # type
     """
     cache_key = service + "_" + session_args.session_key()
 
-    if cache_key in _client_cache:
-        return _client_cache[cache_key]
+    with _client_cache_lock:
+        if cache_key in _client_cache:
+            return _client_cache[cache_key]
 
-    session: boto3.Session = boto3.Session(
-        **session_args.model_dump(by_alias=True, exclude_none=True)
-    )
+        session: boto3.Session = boto3.Session(
+            **session_args.model_dump(by_alias=True, exclude_none=True)
+        )
 
-    client = session.client(service)
-    _client_cache[cache_key] = client
+        client = session.client(service)
+        _client_cache[cache_key] = client
 
     return client
