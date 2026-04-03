@@ -1,0 +1,22 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: pydantic-settings-aws
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Rafael
+    family-names: de Oliveira Marques
+    email: rafaelomarques@gmail.com
+repository-code: 'https://github.com/ceb10n/pydantic-settings-aws'
+url: 'https://ceb10n.github.io/pydantic-settings-aws/'
+abstract: Settings management using AWS Secrets Manager and Pydantic
+keywords:
+  - python
+  - aws
+  - pydantic
+  - pydantic-settings
+license: MIT
