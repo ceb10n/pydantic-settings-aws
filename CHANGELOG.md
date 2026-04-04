@@ -7,24 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-- README: logo, quick start section, why section, SSM Parameter Store example, uv installation instructions, features and requirements sections
-- `CHANGELOG.md` with full history from initial release
-- `Framework :: Pydantic` and `Typing :: Typed` classifiers
-- `keywords` field in pyproject.toml for improved PyPI discoverability
-- `docs` optional dependency group in pyproject.toml (`pip install pydantic-settings-aws[docs]`)
-- `Issues` and `Changelog` URLs in pyproject.toml
-- `content-type = "text/markdown"` on readme declaration
-
-### Changed
-- Improved project description in pyproject.toml
-- `Development Status` classifier updated to `5 - Production/Stable`
-- Pinned `pydantic-settings < 3.0.0` and `boto3 < 2.0.0`
-- Moved dev dependencies from `[dependency-groups]` to `[project.optional-dependencies]`
-- Docs workflow now installs dependencies via `pip install ".[docs]"`
-- All documentation and README updated to reference `AWSSettingsConfigDict` instead of `SettingsConfigDict`
-
-## [1.0.0b1] - 2026-04-03
+## [1.0.0] - 2026-04-03
 
 ### Added
 - `AWSSettingsConfigDict` — extends pydantic-settings' `SettingsConfigDict` with typed, autocomplete-friendly keys for all AWS-specific configuration (`secrets_name`, `secrets_client`, `ssm_client`, `aws_region`, etc.)
@@ -36,6 +19,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `CITATION.cff` for academic citation
 - Separate `docs.yml` GitHub Actions workflow with manual trigger (`workflow_dispatch`) and path-based auto-deploy
 - Explicit least-privilege permissions on all CI workflows
+- README: logo, quick start section, why section, SSM Parameter Store example, uv installation instructions, features and requirements sections
+- `CHANGELOG.md` with full history from initial release
+- `Framework :: Pydantic` and `Typing :: Typed` classifiers
+- `keywords` field in pyproject.toml for improved PyPI discoverability
+- `docs` optional dependency group in pyproject.toml (`pip install pydantic-settings-aws[docs]`)
+- `Issues` and `Changelog` URLs in pyproject.toml
+- `content-type = "text/markdown"` on readme declaration
+- API reference docs for `AWSSettingsConfigDict`, `ParameterStoreBaseSettings`, and `AWSBaseSettings`
+- Thread safety and Python 3.10+ requirement sections in configuration docs
 
 ### Changed
 - Dropped support for Python 3.8 and 3.9
@@ -43,14 +35,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `PythonVersionDeprecationWarning` now targets Python 3.10 (end-of-life October 2026)
 - Replaced bare exception re-raises with `raise` to preserve tracebacks
 - Fixed `AwsSession.session_key()` to access `model_fields` from the class, not the instance (fixes `PydanticDeprecatedSince211` warning)
-- Pinned `pydantic < 3.0.0` to prevent accidental upgrade to an incompatible major version
-- Updated all documentation and examples to use `AWSSettingsConfigDict`
-- Upgraded CI actions to v6
+- Pinned `pydantic < 3.0.0`, `pydantic-settings < 3.0.0`, and `boto3 < 2.0.0` to prevent accidental upgrade to incompatible major versions
+- Improved project description in pyproject.toml
+- `Development Status` classifier updated to `5 - Production/Stable`
+- Moved dev dependencies from `[dependency-groups]` to `[project.optional-dependencies]`
+- Docs workflow now installs dependencies via `pip install ".[docs]"`
+- All documentation and README updated to reference `AWSSettingsConfigDict` instead of `SettingsConfigDict`
 - Ruff `target-version` updated from `py38` to `py310`
+- Upgraded CI actions to v6
 
 ### Fixed
 - Removed `print(key)` debug statement from `AwsSession.session_key()`
 - Fixed log message typo: "caugth" → "caught"
+- Fixed "especify" typo in configuration docs
+- Added missing imports to example code blocks in docs
 
 ## [0.1.2] - 2026-01-17
 
@@ -84,8 +82,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - boto3 session configuration via `model_config`: `aws_region`, `aws_profile`, `aws_access_key_id`, `aws_secret_access_key`, `aws_session_token`
 - Support for passing a pre-built boto3 client via `secrets_client`
 
-[Unreleased]: https://github.com/ceb10n/pydantic-settings-aws/compare/v1.0.0b1...HEAD
-[1.0.0b1]: https://github.com/ceb10n/pydantic-settings-aws/compare/v0.1.2...v1.0.0b1
+[Unreleased]: https://github.com/ceb10n/pydantic-settings-aws/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/ceb10n/pydantic-settings-aws/compare/v0.1.2...v1.0.0
 [0.1.2]: https://github.com/ceb10n/pydantic-settings-aws/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/ceb10n/pydantic-settings-aws/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/ceb10n/pydantic-settings-aws/compare/v0.0.2...v0.1.0
