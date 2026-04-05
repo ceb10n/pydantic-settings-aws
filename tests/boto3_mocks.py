@@ -1,6 +1,8 @@
 import datetime
 from typing import Any
 
+from botocore.exceptions import ClientError  # type: ignore[import-untyped]
+
 
 class SessionMock:
     def __init__(self, *args: Any, **kwargs: Any) -> None:
@@ -46,3 +48,35 @@ class ClientMock:
             ],
             "CreatedDate": datetime.datetime.utcnow(),
         }
+
+
+class ClientErrorMock:
+    """Mock boto3 client that raises a ClientError with the given error code."""
+
+    def __init__(self, error_code: str) -> None:
+        self.error_code = error_code
+
+    def client(self, *args: Any) -> "ClientErrorMock":
+        return self
+
+    def get_parameter(self, **kwargs: Any) -> None:
+        raise ClientError(
+            {"Error": {"Code": self.error_code, "Message": "mocked error"}},
+            "GetParameter",
+        )
+
+    def get_secret_value(self, **kwargs: Any) -> None:
+        raise ClientError(
+            {"Error": {"Code": self.error_code, "Message": "mocked error"}},
+            "GetSecretValue",
+        )
+
+
+class BrokenSessionMock:
+    """Mock boto3 Session that raises on client creation."""
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        pass
+
+    def client(self, name: str) -> None:
+        raise Exception("cannot create client")

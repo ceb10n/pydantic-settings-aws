@@ -2,9 +2,16 @@ import json
 from unittest import mock
 
 import pytest
-from pydantic import ValidationError
 
 from pydantic_settings_aws import aws
+from pydantic_settings_aws.errors import (
+    AWSClientError,
+    AWSSettingsConfigError,
+    ParameterNotFoundError,
+    SecretContentError,
+    SecretDecodeError,
+    SecretNotFoundError,
+)
 
 from .aws_mocks import (
     TARGET_CREATE_CLIENT_FROM_SETTINGS,
@@ -12,11 +19,13 @@ from .aws_mocks import (
     TARGET_SESSION,
     BaseSettingsMock,
     mock_create_client,
+    mock_parameter_not_found,
+    mock_secret_not_found,
     mock_secrets_content_empty,
     mock_secrets_content_invalid_json,
     mock_ssm,
 )
-from .boto3_mocks import SessionMock
+from .boto3_mocks import BrokenSessionMock, SessionMock
 
 
 @mock.patch(TARGET_CREATE_CLIENT_FROM_SETTINGS, mock_ssm)
@@ -117,7 +126,7 @@ def test_get_secrets_content_must_raise_value_error_if_secrets_content_is_none(
         "aws_profile": "profile",
     }
 
-    with pytest.raises(ValueError):
+    with pytest.raises(SecretContentError):
         aws.get_secrets_content(settings)  # type: ignore[arg-type]
 
 
@@ -131,7 +140,7 @@ def test_should_not_obfuscate_json_error_in_case_of_invalid_secrets(*args: objec
         "aws_profile": "profile",
     }
 
-    with pytest.raises(json.decoder.JSONDecodeError):
+    with pytest.raises(SecretDecodeError):
         aws.get_secrets_content(settings)  # type: ignore[arg-type]
 
 
@@ -151,7 +160,7 @@ def test_get_secrets_content_must_not_hide_decode_error_if_not_binary_in_secret_
         "SecretBinary": json.dumps({"username": "admin"})
     }
 
-    with pytest.raises(AttributeError):
+    with pytest.raises(SecretContentError):
         aws._get_secrets_content(content)
 
 
@@ -177,8 +186,41 @@ def test_get_secrets_args_must_not_shadow_pydantic_validation_if_required_args_a
     settings = BaseSettingsMock()
     settings.model_config = {}
 
-    with pytest.raises(ValidationError):
+    with pytest.raises(AWSSettingsConfigError):
         aws._get_secrets_args(settings)  # type: ignore[arg-type]
+
+
+@mock.patch(TARGET_CREATE_CLIENT_FROM_SETTINGS, mock_secret_not_found)
+def test_get_secrets_content_must_raise_secret_not_found_error(*args: object) -> None:
+    aws._client_cache = {}
+    settings = BaseSettingsMock()
+    settings.model_config = {
+        "secrets_name": "secrets/name",
+        "aws_region": "region",
+    }
+
+    with pytest.raises(SecretNotFoundError):
+        aws.get_secrets_content(settings)  # type: ignore[arg-type]
+
+
+@mock.patch(TARGET_CREATE_CLIENT_FROM_SETTINGS, mock_parameter_not_found)
+def test_get_ssm_content_must_raise_parameter_not_found_error(*args: object) -> None:
+    aws._client_cache = {}
+    settings = BaseSettingsMock()
+    settings.model_config = {"aws_region": "region"}
+
+    with pytest.raises(ParameterNotFoundError):
+        aws.get_ssm_content(settings, "field", "my/parameter/name")  # type: ignore[arg-type]
+
+
+@mock.patch(TARGET_SESSION, BrokenSessionMock)
+def test_create_boto3_client_must_raise_aws_client_error_on_failure(*args: object) -> None:
+    aws._client_cache = {}
+    settings = BaseSettingsMock()
+    settings.model_config = {"aws_region": "region"}
+
+    with pytest.raises(AWSClientError):
+        aws._create_client_from_settings(settings, "ssm", "ssm_client")  # type: ignore[arg-type]
 
 
 @mock.patch(TARGET_SESSION, mock_ssm)

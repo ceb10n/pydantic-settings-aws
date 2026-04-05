@@ -20,8 +20,15 @@ class ParameterStoreSettings(ParameterStoreBaseSettings):
 
 In this case, `pydantic-settings-aws` will leave to boto3 to try to identify how he can connect to AWS, and then will look for the parameters with name `mongodb_host` and `mongodb_db_name`.
 
-!!! warning "We don't shadow pydantic and boto3 errors"
-    In the above case, if for some reason mongodb_host is `None`, it will raise a pydantic's `ValidationError`.
+!!! info "Structured exceptions"
+    `pydantic-settings-aws` wraps errors into its own exception hierarchy so you can catch them precisely:
+
+    - `ParameterNotFoundError` — the parameter does not exist in Parameter Store
+    - `AWSClientError` — a boto3 session or client could not be created
+    - `AWSSettingsConfigError` — the settings configuration is invalid or missing required fields
+
+    All of these inherit from `PydanticSettingsAWSError`, so you can catch them at any level.
+    Unrecognised boto3 / botocore errors are re-raised as-is.
 
 
 ## :fontawesome-solid-quote-right: Specifying the name of the parameter

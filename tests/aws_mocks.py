@@ -2,7 +2,7 @@ from typing import Any
 
 from pydantic_settings_aws import AWSSettingsConfigDict
 
-from .boto3_mocks import ClientMock
+from .boto3_mocks import ClientErrorMock, ClientMock
 
 TARGET_SESSION = "pydantic_settings_aws.aws.boto3.Session"
 
@@ -34,6 +34,14 @@ def mock_ssm(
 
 def mock_create_client(*args: Any) -> object:
     return object()
+
+
+def mock_secret_not_found(*args: Any) -> ClientErrorMock:
+    return ClientErrorMock("ResourceNotFoundException")
+
+
+def mock_parameter_not_found(*args: Any) -> ClientErrorMock:
+    return ClientErrorMock("ParameterNotFound")
 
 
 class BaseSettingsMock:
