@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-04-05
+
+### Added
+- Structured exception hierarchy: `PydanticSettingsAWSError`, `SecretsManagerError`, `SecretNotFoundError`, `SecretContentError`, `SecretDecodeError`, `SSMError`, `ParameterNotFoundError`, `AWSClientError`, `AWSSettingsConfigError` — all exported from the top-level package
+- Docstrings for all public API classes: `AWSBaseSettings`, `ParameterStoreBaseSettings`, `SecretsManagerBaseSettings`, and per-field docstrings for `AWSSettingsConfigDict`
+
+### Changed
+- boto3 / botocore errors are now wrapped in the structured exception hierarchy instead of propagating as raw exceptions
+- Documentation updated to reflect the new exception hierarchy, replacing the "we don't shadow boto3 errors" warnings
+
 ## [1.0.0] - 2026-04-03
 
 ### Added
@@ -82,7 +92,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - boto3 session configuration via `model_config`: `aws_region`, `aws_profile`, `aws_access_key_id`, `aws_secret_access_key`, `aws_session_token`
 - Support for passing a pre-built boto3 client via `secrets_client`
 
-[Unreleased]: https://github.com/ceb10n/pydantic-settings-aws/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/ceb10n/pydantic-settings-aws/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/ceb10n/pydantic-settings-aws/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/ceb10n/pydantic-settings-aws/compare/v0.1.2...v1.0.0
 [0.1.2]: https://github.com/ceb10n/pydantic-settings-aws/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/ceb10n/pydantic-settings-aws/compare/v0.1.0...v0.1.1
