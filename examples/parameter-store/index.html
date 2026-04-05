@@ -899,9 +899,16 @@
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8"></a>    <span class="n">mongodb_db_name</span><span class="p">:</span> <span class="nb">str</span>
 </span></code></pre></div></td></tr></table></div>
 <p>In this case, <code>pydantic-settings-aws</code> will leave to boto3 to try to identify how he can connect to AWS, and then will look for the parameters with name <code>mongodb_host</code> and <code>mongodb_db_name</code>.</p>
-<div class="admonition warning">
-<p class="admonition-title">We don't shadow pydantic and boto3 errors</p>
-<p>In the above case, if for some reason mongodb_host is <code>None</code>, it will raise a pydantic's <code>ValidationError</code>.</p>
+<div class="admonition info">
+<p class="admonition-title">Structured exceptions</p>
+<p><code>pydantic-settings-aws</code> wraps errors into its own exception hierarchy so you can catch them precisely:</p>
+<ul>
+<li><code>ParameterNotFoundError</code> — the parameter does not exist in Parameter Store</li>
+<li><code>AWSClientError</code> — a boto3 session or client could not be created</li>
+<li><code>AWSSettingsConfigError</code> — the settings configuration is invalid or missing required fields</li>
+</ul>
+<p>All of these inherit from <code>PydanticSettingsAWSError</code>, so you can catch them at any level.
+Unrecognised boto3 / botocore errors are re-raised as-is.</p>
 </div>
 <h2 id="specifying-the-name-of-the-parameter"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M448 296c0 66.3-53.7 120-120 120h-8c-17.7 0-32-14.3-32-32s14.3-32 32-32h8c30.9 0 56-25.1 56-56v-8h-64c-35.3 0-64-28.7-64-64v-64c0-35.3 28.7-64 64-64h64c35.3 0 64 28.7 64 64zm-256 0c0 66.3-53.7 120-120 120h-8c-17.7 0-32-14.3-32-32s14.3-32 32-32h8c30.9 0 56-25.1 56-56v-8H64c-35.3 0-64-28.7-64-64v-64c0-35.3 28.7-64 64-64h64c35.3 0 64 28.7 64 64z"/></svg></span> Specifying the name of the parameter</h2>
 <p>For almost all cases, your parameter's name will be different from your field name.</p>

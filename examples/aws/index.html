@@ -868,9 +868,19 @@
 </span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14"></a>    <span class="n">environment</span><span class="p">:</span> <span class="nb">str</span> <span class="c1"># not related to aws. If you have an environment named ENVIRONMENT, it will work as if you were using BaseSettings</span>
 </span></code></pre></div></td></tr></table></div>
 <p>In this case, <code>pydantic-settings-aws</code> will leave to boto3 to try to identify how he can connect to AWS.</p>
-<div class="admonition warning">
-<p class="admonition-title">We don't shadow pydantic and boto3 errors</p>
-<p>In the above case, if for some reason any field is <code>None</code>, it will raise a pydantic's <code>ValidationError</code>.</p>
+<div class="admonition info">
+<p class="admonition-title">Structured exceptions</p>
+<p><code>pydantic-settings-aws</code> wraps errors into its own exception hierarchy so you can catch them precisely:</p>
+<ul>
+<li><code>SecretNotFoundError</code> — the secret does not exist in Secrets Manager</li>
+<li><code>SecretContentError</code> — the secret exists but its content is empty or cannot be decoded</li>
+<li><code>SecretDecodeError</code> — the secret content is not valid JSON</li>
+<li><code>ParameterNotFoundError</code> — the parameter does not exist in Parameter Store</li>
+<li><code>AWSClientError</code> — a boto3 session or client could not be created</li>
+<li><code>AWSSettingsConfigError</code> — the settings configuration is invalid or missing required fields</li>
+</ul>
+<p>All of these inherit from <code>PydanticSettingsAWSError</code>, so you can catch them at any level.
+Unrecognised boto3 / botocore errors are re-raised as-is.</p>
 </div>
 
 
