@@ -28,5 +28,15 @@ class ParameterStoreSettings(AWSBaseSettings):
 
 In this case, `pydantic-settings-aws` will leave to boto3 to try to identify how he can connect to AWS.
 
-!!! warning "We don't shadow pydantic and boto3 errors"
-    In the above case, if for some reason any field is `None`, it will raise a pydantic's `ValidationError`.
+!!! info "Structured exceptions"
+    `pydantic-settings-aws` wraps errors into its own exception hierarchy so you can catch them precisely:
+
+    - `SecretNotFoundError` — the secret does not exist in Secrets Manager
+    - `SecretContentError` — the secret exists but its content is empty or cannot be decoded
+    - `SecretDecodeError` — the secret content is not valid JSON
+    - `ParameterNotFoundError` — the parameter does not exist in Parameter Store
+    - `AWSClientError` — a boto3 session or client could not be created
+    - `AWSSettingsConfigError` — the settings configuration is invalid or missing required fields
+
+    All of these inherit from `PydanticSettingsAWSError`, so you can catch them at any level.
+    Unrecognised boto3 / botocore errors are re-raised as-is.

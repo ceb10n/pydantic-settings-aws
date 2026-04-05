@@ -3,9 +3,18 @@ import threading
 from typing import Any, AnyStr, Literal
 
 import boto3  # type: ignore[import-untyped]
+from botocore.exceptions import ClientError  # type: ignore[import-untyped]
 from pydantic import ValidationError
 from pydantic_settings import BaseSettings
 
+from .errors import (
+    AWSClientError,
+    AWSSettingsConfigError,
+    ParameterNotFoundError,
+    SecretContentError,
+    SecretDecodeError,
+    SecretNotFoundError,
+)
 from .logger import logger
 from .models import AwsSecretsArgs, AwsSession
 
@@ -44,9 +53,16 @@ def get_ssm_content(
         client = _create_client_from_settings(settings, "ssm", "ssm_client")
 
     logger.debug(f"Getting parameter {ssm_name} value with boto3 client")
-    ssm_response: dict[str, Any] = client.get_parameter(  # type: ignore
-        Name=ssm_name, WithDecryption=True
-    )
+    try:
+        ssm_response: dict[str, Any] = client.get_parameter(  # type: ignore
+            Name=ssm_name, WithDecryption=True
+        )
+    except ClientError as e:
+        if e.response["Error"]["Code"] == "ParameterNotFound":
+            raise ParameterNotFoundError(
+                f"Parameter '{ssm_name}' not found in SSM Parameter Store"
+            ) from e
+        raise
 
     return ssm_response.get("Parameter", {}).get("Value", None)
 
@@ -58,9 +74,16 @@ def get_secrets_content(settings: type[BaseSettings]) -> dict[str, Any]:
     secrets_args: AwsSecretsArgs = _get_secrets_args(settings)
 
     logger.debug("Getting secrets manager value with boto3 client")
-    secret_response = client.get_secret_value(
-        **secrets_args.model_dump(by_alias=True, exclude_none=True)
-    )
+    try:
+        secret_response = client.get_secret_value(
+            **secrets_args.model_dump(by_alias=True, exclude_none=True)
+        )
+    except ClientError as e:
+        if e.response["Error"]["Code"] == "ResourceNotFoundException":
+            raise SecretNotFoundError(
+                f"Secret '{secrets_args.secrets_name}' not found in Secrets Manager"
+            ) from e
+        raise
 
     secrets_content = _get_secrets_content(secret_response)
 
@@ -68,7 +91,9 @@ def get_secrets_content(settings: type[BaseSettings]) -> dict[str, Any]:
         logger.warning(
             "Secrets content was not present neither in SecretString nor SecretBinary"
         )
-        raise ValueError("Could not get secrets content")
+        raise SecretContentError(
+            f"Secret '{secrets_args.secrets_name}' exists but its content is empty"
+        )
 
     try:
         return json.loads(secrets_content)
@@ -76,7 +101,9 @@ def get_secrets_content(settings: type[BaseSettings]) -> dict[str, Any]:
         logger.error(
             f"The content of the secrets manager must be a valid json: {json_err}"
         )
-        raise
+        raise SecretDecodeError(
+            f"Secret '{secrets_args.secrets_name}' content is not valid JSON"
+        ) from json_err
 
 
 def _get_secrets_args(settings: type[BaseSettings]) -> AwsSecretsArgs:
@@ -97,7 +124,9 @@ def _get_secrets_args(settings: type[BaseSettings]) -> AwsSecretsArgs:
         logger.error(
             f"A validation error was caught. Please check all required fields: {err}"
         )
-        raise
+        raise AWSSettingsConfigError(
+            f"Invalid or missing Secrets Manager configuration: {err}"
+        ) from err
 
 
 def _get_secrets_content(
@@ -120,8 +149,9 @@ def _get_secrets_content(
                 secrets_content = secret_binary.decode("utf-8")
             except (AttributeError, ValueError) as err:
                 logger.error(f"Error decoding secrets content: {err}")
-
-                raise err
+                raise SecretContentError(
+                    "Failed to decode SecretBinary content as UTF-8"
+                ) from err
 
     return secrets_content
 
@@ -148,8 +178,6 @@ def _create_client_from_settings(  # type: ignore[no-untyped-def]
 def _create_boto3_client(session_args: AwsSession, service: AWSService):  # type: ignore[no-untyped-def]
     """Create a boto3 client for the service informed.
 
-    Neither `boto3` nor `pydantic` exceptions will be handled.
-
     Args:
         session_args (AwsSession): Settings informed in `SettingsConfigDict` to create
             the boto3 session.
@@ -157,6 +185,9 @@ def _create_boto3_client(session_args: AwsSession, service: AWSService):  # type
 
     Returns:
         boto3.client: An aws service boto3 client.
+
+    Raises:
+        AWSClientError: If the boto3 session or client cannot be created.
     """
     cache_key = service + "_" + session_args.session_key()
 
@@ -164,11 +195,16 @@ def _create_boto3_client(session_args: AwsSession, service: AWSService):  # type
         if cache_key in _client_cache:
             return _client_cache[cache_key]
 
-        session: boto3.Session = boto3.Session(
-            **session_args.model_dump(by_alias=True, exclude_none=True)
-        )
+        try:
+            session: boto3.Session = boto3.Session(
+                **session_args.model_dump(by_alias=True, exclude_none=True)
+            )
+            client = session.client(service)
+        except Exception as e:
+            raise AWSClientError(
+                f"Failed to create boto3 client for '{service}': {e}"
+            ) from e
 
-        client = session.client(service)
         _client_cache[cache_key] = client
 
     return client
