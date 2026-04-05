@@ -24,6 +24,8 @@ from .aws_mocks import (
     mock_secrets_content_empty,
     mock_secrets_content_invalid_json,
     mock_ssm,
+    mock_unknown_secrets_client_error,
+    mock_unknown_ssm_client_error,
 )
 from .boto3_mocks import BrokenSessionMock, SessionMock
 
@@ -221,6 +223,33 @@ def test_create_boto3_client_must_raise_aws_client_error_on_failure(*args: objec
 
     with pytest.raises(AWSClientError):
         aws._create_client_from_settings(settings, "ssm", "ssm_client")  # type: ignore[arg-type]
+
+
+@mock.patch(TARGET_CREATE_CLIENT_FROM_SETTINGS, mock_unknown_ssm_client_error)
+def test_get_ssm_content_must_reraise_unknown_client_errors(*args: object) -> None:
+    from botocore.exceptions import ClientError  # type: ignore[import-untyped]
+
+    aws._client_cache = {}
+    settings = BaseSettingsMock()
+    settings.model_config = {"aws_region": "region"}
+
+    with pytest.raises(ClientError):
+        aws.get_ssm_content(settings, "field", "my/parameter/name")  # type: ignore[arg-type]
+
+
+@mock.patch(TARGET_CREATE_CLIENT_FROM_SETTINGS, mock_unknown_secrets_client_error)
+def test_get_secrets_content_must_reraise_unknown_client_errors(*args: object) -> None:
+    from botocore.exceptions import ClientError  # type: ignore[import-untyped]
+
+    aws._client_cache = {}
+    settings = BaseSettingsMock()
+    settings.model_config = {
+        "secrets_name": "secrets/name",
+        "aws_region": "region",
+    }
+
+    with pytest.raises(ClientError):
+        aws.get_secrets_content(settings)  # type: ignore[arg-type]
 
 
 @mock.patch(TARGET_SESSION, mock_ssm)

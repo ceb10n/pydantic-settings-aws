@@ -44,5 +44,13 @@ def mock_parameter_not_found(*args: Any) -> ClientErrorMock:
     return ClientErrorMock("ParameterNotFound")
 
 
+def mock_unknown_secrets_client_error(*args: Any) -> ClientErrorMock:
+    return ClientErrorMock("InternalServiceError")
+
+
+def mock_unknown_ssm_client_error(*args: Any) -> ClientErrorMock:
+    return ClientErrorMock("InternalServerError")
+
+
 class BaseSettingsMock:
     model_config: AWSSettingsConfigDict = AWSSettingsConfigDict()
