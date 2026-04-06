@@ -35,40 +35,64 @@ In this case, `pydantic-settings-aws` will leave to boto3 to try to identify how
 
 For almost all cases, your parameter's name will be different from your field name.
 
-To deal with these cases, you must use `Annotated` and add the name of your parameter:
+=== "SSM descriptor"
 
-```py linenums="1"
-from typing import Annotated
-from pydantic_settings_aws import AWSSettingsConfigDict, ParameterStoreBaseSettings
+    ```py linenums="1"
+    from typing import Annotated
+    from pydantic_settings_aws import AWSSettingsConfigDict, ParameterStoreBaseSettings, SSM
 
 
-class DynamoDBSettings(ParameterStoreBaseSettings):
-    model_config = AWSSettingsConfigDict(
-        ssm_client=my_ssm_client
-    )
+    class DynamoDBSettings(ParameterStoreBaseSettings):
+        model_config = AWSSettingsConfigDict(
+            ssm_client=my_ssm_client
+        )
 
-    db_name: Annotated[str, "/databases/dynamodb/payments/dbname"]
-```
+        db_name: Annotated[str, SSM(name="/databases/dynamodb/payments/dbname")]
+    ```
+
+=== "string (legacy)"
+
+    ```py linenums="1"
+    from typing import Annotated
+    from pydantic_settings_aws import AWSSettingsConfigDict, ParameterStoreBaseSettings
+
+
+    class DynamoDBSettings(ParameterStoreBaseSettings):
+        model_config = AWSSettingsConfigDict(
+            ssm_client=my_ssm_client
+        )
+
+        db_name: Annotated[str, "/databases/dynamodb/payments/dbname"]
+    ```
 
 ## :fontawesome-solid-viruses: Multiple accounts and regions
 
-If you need to work with multiple accounts or regions, you can use `Annotated` and specify a `dict`:
+If you need to work with multiple accounts or regions, you can use `Annotated` and specify a per-field client:
 
-```py
-{
-    "ssm": "parameter name",
-    "ssm_client": my_boto3_client
-}
-```
+=== "SSM descriptor"
 
-```py linenums="1"
-from typing import Annotated
-from pydantic_settings_aws import ParameterStoreBaseSettings
+    ```py linenums="1"
+    from typing import Annotated
+    from pydantic_settings_aws import ParameterStoreBaseSettings, SSM
 
 
-class MongoDBSettings(ParameterStoreBaseSettings):
+    class MongoDBSettings(ParameterStoreBaseSettings):
 
-    prod_host: Annotated[str, {"ssm": "/prod/databases/mongodb/host", "ssm_client": prod_client}]
-    release_host: Annotated[str, {"ssm": "/release/databases/mongodb/host", "ssm_client": release_client}]
-    development_host: Annotated[str, {"ssm": "/development/databases/mongodb/host", "ssm_client": development_client}]
-```
+        prod_host: Annotated[str, SSM(name="/prod/databases/mongodb/host", client=prod_client)]
+        release_host: Annotated[str, SSM(name="/release/databases/mongodb/host", client=release_client)]
+        development_host: Annotated[str, SSM(name="/development/databases/mongodb/host", client=development_client)]
+    ```
+
+=== "dict (legacy)"
+
+    ```py linenums="1"
+    from typing import Annotated
+    from pydantic_settings_aws import ParameterStoreBaseSettings
+
+
+    class MongoDBSettings(ParameterStoreBaseSettings):
+
+        prod_host: Annotated[str, {"ssm": "/prod/databases/mongodb/host", "ssm_client": prod_client}]
+        release_host: Annotated[str, {"ssm": "/release/databases/mongodb/host", "ssm_client": release_client}]
+        development_host: Annotated[str, {"ssm": "/development/databases/mongodb/host", "ssm_client": development_client}]
+    ```

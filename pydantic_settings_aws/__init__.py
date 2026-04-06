@@ -10,6 +10,7 @@ from .errors import (
     SecretsManagerError,
     SSMError,
 )
+from .fields import SSM, Secrets
 from .settings import (
     AWSBaseSettings,
     ParameterStoreBaseSettings,
@@ -28,8 +29,10 @@ __all__ = [
     "SecretContentError",
     "SecretDecodeError",
     "SecretNotFoundError",
+    "Secrets",
     "SecretsManagerBaseSettings",
     "SecretsManagerError",
+    "SSM",
     "SSMError",
 ]
 

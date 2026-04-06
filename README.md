@@ -62,6 +62,8 @@ That’s it, `boto3` will resolve your AWS credentials automatically using its s
 
 - Load settings from **AWS Secrets Manager**, **SSM Parameter Store**, or both simultaneously
 - Type-safe configuration with full IDE autocomplete via `AWSSettingsConfigDict`
+- Typed field descriptors `Secrets` and `SSM` as ergonomic alternatives to raw dict metadata
+- Structured exception hierarchy (`SecretNotFoundError`, `ParameterNotFoundError`, etc.) for precise error handling
 - Multi-region and multi-account support via per-field boto3 clients
 - Thread-safe client cache, compatible with free-threaded Python (3.13t, 3.14t)
 - Falls back to environment variables, dotenv, and secret files automatically
@@ -126,7 +128,7 @@ Your secret content must be valid JSON with keys matching the field names:
 
 ```python
 from typing import Annotated
-from pydantic_settings_aws import AWSSettingsConfigDict, ParameterStoreBaseSettings
+from pydantic_settings_aws import AWSSettingsConfigDict, ParameterStoreBaseSettings, SSM
 
 
 class MySettings(ParameterStoreBaseSettings):
@@ -135,8 +137,8 @@ class MySettings(ParameterStoreBaseSettings):
     # pydantic-settings-aws looks for a parameter named "db_host"
     db_host: str
 
-    # explicit parameter name via Annotated
-    db_port: Annotated[str, "/myapp/prod/db/port"]
+    # explicit parameter name via SSM descriptor
+    db_port: Annotated[str, SSM(name="/myapp/prod/db/port")]
 ```
 
 ### 🙋🏾‍♂️ Secrets Manager — with AWS profile

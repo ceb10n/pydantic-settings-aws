@@ -9,22 +9,43 @@ The only restriction if for Secrets Manager. You can only use one *secret / clie
 
 The only required setting is your secret's name. All other configurations you can leave to boto3 to deal.
 
-```py linenums="1"
-from typing import Annotated
-from pydantic_settings_aws import AWSBaseSettings, AWSSettingsConfigDict
+=== "typed descriptors"
+
+    ```py linenums="1"
+    from typing import Annotated
+    from pydantic_settings_aws import AWSBaseSettings, AWSSettingsConfigDict, SSM, Secrets
 
 
-class ParameterStoreSettings(AWSBaseSettings):
-    model_config = AWSSettingsConfigDict(
-        secrets_name="my/secret"
-    )
+    class ParameterStoreSettings(AWSBaseSettings):
+        model_config = AWSSettingsConfigDict(
+            secrets_name="my/secret"
+        )
 
-    username: Annotated[str, {"service": "secrets"}]
-    password: Annotated[str, {"service": "secrets"}]
-    mongodb_host: Annotated[str, {"service": "ssm", "ssm": "/mysystem/mongodb/host"}]
-    mongodb_db_name: Annotated[str, {"service": "ssm"}] # will look for a parameter named mongodb_db_name
-    environment: str # not related to aws. If you have an environment named ENVIRONMENT, it will work as if you were using BaseSettings
-```
+        username: Annotated[str, Secrets()]
+        password: Annotated[str, Secrets()]
+        mongodb_host: Annotated[str, SSM(name="/mysystem/mongodb/host")]
+        mongodb_db_name: Annotated[str, SSM()]  # will look for a parameter named mongodb_db_name
+        environment: str  # not related to aws. If you have an environment named ENVIRONMENT, it will work as if you were using BaseSettings
+    ```
+
+=== "dict (legacy)"
+
+    ```py linenums="1"
+    from typing import Annotated
+    from pydantic_settings_aws import AWSBaseSettings, AWSSettingsConfigDict
+
+
+    class ParameterStoreSettings(AWSBaseSettings):
+        model_config = AWSSettingsConfigDict(
+            secrets_name="my/secret"
+        )
+
+        username: Annotated[str, {"service": "secrets"}]
+        password: Annotated[str, {"service": "secrets"}]
+        mongodb_host: Annotated[str, {"service": "ssm", "ssm": "/mysystem/mongodb/host"}]
+        mongodb_db_name: Annotated[str, {"service": "ssm"}]  # will look for a parameter named mongodb_db_name
+        environment: str  # not related to aws. If you have an environment named ENVIRONMENT, it will work as if you were using BaseSettings
+    ```
 
 In this case, `pydantic-settings-aws` will leave to boto3 to try to identify how he can connect to AWS.
 

@@ -4,11 +4,15 @@ from .settings_mocks import (
     AWSWithNonDictMetadata,
     AWSWithParameterAndSecretsWithDefaultBoto3Client,
     AWSWithParameterSecretsAndEnvironmentWithDefaultBoto3Client,
+    AWSWithTypedDescriptors,
     AWSWithUnknownService,
     MySecretsWithClientConfig,
     ParameterSettings,
     ParameterWithOptionalValueSettings,
+    ParameterWithSSMDescriptor,
+    ParameterWithSSMDescriptorNoName,
     ParameterWithTwoSSMClientSettings,
+    SecretsWithFieldDescriptor,
     SecretsWithNestedContent,
     dict_secrets_with_username_and_password,
 )
@@ -92,3 +96,30 @@ def test_aws_settings_should_ignore_value_if_metadata_is_not_a_dict() -> None:
     my_config = AWSWithNonDictMetadata()
     assert my_config is not None
     assert my_config.my_name is None
+
+
+def test_ssm_descriptor_with_name_and_client() -> None:
+    my_config = ParameterWithSSMDescriptor()  # type: ignore[call-arg]
+    assert my_config is not None
+    assert my_config.my_ssm is not None
+    assert isinstance(my_config.my_ssm, str)
+
+
+def test_ssm_descriptor_with_no_name_uses_field_name() -> None:
+    my_config = ParameterWithSSMDescriptorNoName()  # type: ignore[call-arg]
+    assert my_config is not None
+    assert my_config.my_ssm is not None
+    assert isinstance(my_config.my_ssm, str)
+
+
+def test_secrets_descriptor_with_field_override() -> None:
+    my_config = SecretsWithFieldDescriptor()  # type: ignore[call-arg]
+    assert my_config is not None
+    assert my_config.password == "supersecret"
+
+
+def test_aws_settings_with_typed_descriptors() -> None:
+    my_config = AWSWithTypedDescriptors()  # type: ignore[call-arg]
+    assert my_config is not None
+    assert my_config.username == dict_secrets_with_username_and_password["username"]
+    assert my_config.host is not None

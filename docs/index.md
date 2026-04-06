@@ -25,7 +25,6 @@ pip install pydantic-settings-aws
 - pydantic >= 2.0.1
 - pydantic-settings >= 2.0.2
 - boto3 >= 1.27.0
-- boto3-stubs[secretsmanager] >= 1.27.0
 
 ## Usage
 

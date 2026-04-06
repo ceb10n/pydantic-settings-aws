@@ -1,6 +1,6 @@
 import json
 import threading
-from typing import Any, AnyStr, Literal
+from typing import Any, Literal
 
 import boto3  # type: ignore[import-untyped]
 from botocore.exceptions import ClientError  # type: ignore[import-untyped]
@@ -15,6 +15,7 @@ from .errors import (
     SecretDecodeError,
     SecretNotFoundError,
 )
+from .fields import SSM
 from .logger import logger
 from .models import AwsSecretsArgs, AwsSession
 
@@ -29,7 +30,7 @@ _client_cache_lock = threading.Lock()
 def get_ssm_content(
     settings: type[BaseSettings],
     field_name: str,
-    ssm_info: dict[Any, AnyStr] | AnyStr | None = None,
+    ssm_info: dict[str, Any] | str | SSM | None = None,
 ) -> str | None:
     client = None
     ssm_name = field_name
@@ -45,6 +46,12 @@ def get_ssm_content(
         logger.debug("Checking for a especific boto3 client for the Parameter")
         client = ssm_info.get("ssm_client", None)
 
+    elif isinstance(ssm_info, SSM):
+        logger.debug("Parameter specified as an SSM descriptor")
+        if ssm_info.name:
+            ssm_name = ssm_info.name
+        client = ssm_info.client
+
     else:
         logger.debug("Will try to find a parameter with the parameter name")
 
@@ -54,7 +61,7 @@ def get_ssm_content(
 
     logger.debug(f"Getting parameter {ssm_name} value with boto3 client")
     try:
-        ssm_response: dict[str, Any] = client.get_parameter(  # type: ignore
+        ssm_response: dict[str, Any] = client.get_parameter(
             Name=ssm_name, WithDecryption=True
         )
     except ClientError as e:
