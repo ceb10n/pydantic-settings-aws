@@ -7,15 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.1.0] - 2026-04-05
+## [1.1.0] - 2026-04-06
 
 ### Added
+- Typed field descriptors `Secrets` and `SSM` as ergonomic, autocomplete-friendly alternatives to raw dict metadata — both exported from the top-level package
 - Structured exception hierarchy: `PydanticSettingsAWSError`, `SecretsManagerError`, `SecretNotFoundError`, `SecretContentError`, `SecretDecodeError`, `SSMError`, `ParameterNotFoundError`, `AWSClientError`, `AWSSettingsConfigError` — all exported from the top-level package
-- Docstrings for all public API classes: `AWSBaseSettings`, `ParameterStoreBaseSettings`, `SecretsManagerBaseSettings`, and per-field docstrings for `AWSSettingsConfigDict`
+- Docstrings for all public API classes: `AWSBaseSettings`, `ParameterStoreBaseSettings`, `SecretsManagerBaseSettings`, `Secrets`, `SSM`, and per-field docstrings for `AWSSettingsConfigDict`
+- API reference docs for all public exceptions and the new `Secrets` and `SSM` descriptors
 
 ### Changed
 - boto3 / botocore errors are now wrapped in the structured exception hierarchy instead of propagating as raw exceptions
-- Documentation updated to reflect the new exception hierarchy, replacing the "we don't shadow boto3 errors" warnings
+- `get_ssm_content` signature updated from `AnyStr`-based to an explicit `dict[str, Any] | str | SSM | None` union
+- Documentation updated to reflect the new exception hierarchy and typed descriptors, replacing the "we don't shadow boto3 errors" warnings
+- Removed stale `boto3-stubs` dependency mention from docs
 
 ## [1.0.0] - 2026-04-03
 
