@@ -7,6 +7,8 @@ from pydantic_settings_aws import (
     AWSBaseSettings,
     AWSSettingsConfigDict,
     ParameterStoreBaseSettings,
+    SSM,
+    Secrets,
     SecretsManagerBaseSettings,
 )
 
@@ -124,3 +126,46 @@ class AWSWithUnknownService(AWSBaseSettings):
 
 class AWSWithNonDictMetadata(AWSBaseSettings):
     my_name: Annotated[str | None, "my irrelevant metadata"] = None
+
+
+# --- SSM descriptor mocks ---
+
+class ParameterWithSSMDescriptor(ParameterStoreBaseSettings):
+    my_ssm: Annotated[
+        str,
+        SSM(name="my/parameter", client=ClientMock(ssm_value="value")),
+    ]
+
+
+class ParameterWithSSMDescriptorNoName(ParameterStoreBaseSettings):
+    model_config = AWSSettingsConfigDict(ssm_client=ClientMock(ssm_value="value"))
+
+    my_ssm: Annotated[str, SSM()]
+
+
+# --- Secrets descriptor mocks ---
+
+secrets_with_db_password = json.dumps({"db_password": "supersecret"})
+mock_secrets_with_db_password = ClientMock(secret_string=secrets_with_db_password)
+
+
+class SecretsWithFieldDescriptor(SecretsManagerBaseSettings):
+    model_config = AWSSettingsConfigDict(
+        secrets_name="myapp/prod",
+        secrets_client=mock_secrets_with_db_password,
+    )
+
+    password: Annotated[str, Secrets(field="db_password")]
+
+
+# --- AWSBaseSettings with typed descriptors ---
+
+class AWSWithTypedDescriptors(AWSBaseSettings):
+    model_config = AWSSettingsConfigDict(
+        ssm_client=ClientMock(ssm_value="value"),
+        secrets_client=mock_secrets_with_username_and_pwd,
+        secrets_name="my/secret",
+    )
+
+    username: Annotated[str, Secrets(field="username")]
+    host: Annotated[str, SSM(name="my/host/parameter")]

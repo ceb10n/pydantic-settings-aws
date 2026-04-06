@@ -3,7 +3,7 @@ from unittest import mock
 
 import pytest
 
-from pydantic_settings_aws import aws
+from pydantic_settings_aws import SSM, aws
 from pydantic_settings_aws.errors import (
     AWSClientError,
     AWSSettingsConfigError,
@@ -190,6 +190,28 @@ def test_get_secrets_args_must_not_shadow_pydantic_validation_if_required_args_a
 
     with pytest.raises(AWSSettingsConfigError):
         aws._get_secrets_args(settings)  # type: ignore[arg-type]
+
+
+@mock.patch(TARGET_CREATE_CLIENT_FROM_SETTINGS, mock_ssm)
+def test_get_ssm_content_with_ssm_descriptor_name(*args: object) -> None:
+    aws._client_cache = {}
+    settings = BaseSettingsMock()
+    settings.model_config = {"aws_region": "region"}
+    value = aws.get_ssm_content(settings, "field", SSM(name="my/parameter/name"))  # type: ignore[arg-type]
+
+    assert value is not None
+    assert isinstance(value, str)
+
+
+@mock.patch(TARGET_CREATE_CLIENT_FROM_SETTINGS, mock_ssm)
+def test_get_ssm_content_with_ssm_descriptor_no_name_uses_field_name(*args: object) -> None:
+    aws._client_cache = {}
+    settings = BaseSettingsMock()
+    settings.model_config = {"aws_region": "region"}
+    value = aws.get_ssm_content(settings, "field", SSM())  # type: ignore[arg-type]
+
+    assert value is not None
+    assert isinstance(value, str)
 
 
 @mock.patch(TARGET_CREATE_CLIENT_FROM_SETTINGS, mock_secret_not_found)

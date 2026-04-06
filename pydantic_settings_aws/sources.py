@@ -64,7 +64,8 @@ class AWSSettingsSource(PydanticBaseSettingsSource):
                 f"Getting value from secrets manager for filed {field_name}"
             )
             json_content = aws.get_secrets_content(self.settings_cls)
-            field_value = json_content.get(field_name)
+            secret_key = utils.get_secrets_field_name(field.metadata, field_name)
+            field_value = json_content.get(secret_key)
 
         return field_value, field_name, False
 
@@ -144,7 +145,8 @@ class SecretsManagerSettingsSource(PydanticBaseSettingsSource):
     def get_field_value(
         self, field: FieldInfo, field_name: str
     ) -> tuple[Any, str, bool]:
-        field_value = self._json_content.get(field_name)
+        secret_key = utils.get_secrets_field_name(field.metadata, field_name)
+        field_value = self._json_content.get(secret_key)
         return field_value, field_name, False
 
     def prepare_field_value(
