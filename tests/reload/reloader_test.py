@@ -286,27 +286,38 @@ def test_ttl_fires_change_event_on_reload() -> None:
 # Background thread (interval mode)
 
 def test_background_thread_reloads_on_interval() -> None:
+    import threading
+
     client = MutableSSMClientMock("v1")
     reloader = SettingsReloader(make_ssm_settings(client), interval=0.05)
+    reloaded = threading.Event()
+
+    @reloader.on_change("my_param")
+    def handler(changed: dict[str, ChangeEvent]) -> None:
+        reloaded.set()
 
     with reloader:
         client.ssm_value = "v2"
-        time.sleep(0.15)
+        assert reloaded.wait(timeout=2.0), "reload did not fire within 2s"
         assert reloader.my_param == "v2"
 
 
 def test_background_thread_fires_change_event() -> None:
+    import threading
+
     client = MutableSSMClientMock("v1")
     reloader = SettingsReloader(make_ssm_settings(client), interval=0.05)
     received: list[dict[str, ChangeEvent]] = []
+    reloaded = threading.Event()
 
     @reloader.on_change("my_param")
     def handler(changed: dict[str, ChangeEvent]) -> None:
         received.append(changed)
+        reloaded.set()
 
     with reloader:
         client.ssm_value = "v2"
-        time.sleep(0.15)
+        assert reloaded.wait(timeout=2.0), "change event did not fire within 2s"
 
     assert len(received) >= 1
     assert received[0]["my_param"].old == "v1"
