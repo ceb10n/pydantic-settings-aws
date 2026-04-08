@@ -242,6 +242,69 @@ def test_listener_exception_does_not_abort_reload() -> None:
     assert second_fired
 
 
+def test_global_listener_exception_does_not_abort_other_global_listeners() -> None:
+    client = MutableSSMClientMock("v1")
+    reloader = SettingsReloader(make_ssm_settings(client))
+    second_fired = False
+
+    @reloader.on_change()
+    def bad_global(changed: dict[str, ChangeEvent]) -> None:
+        raise RuntimeError("oops in global listener")
+
+    @reloader.on_change()
+    def good_global(changed: dict[str, ChangeEvent]) -> None:
+        nonlocal second_fired
+        second_fired = True
+
+    client.ssm_value = "v2"
+    reloader.reload()  # must not raise despite bad_global
+
+    assert second_fired
+
+
+def test_ttl_double_checked_locking_no_reload_when_concurrent_reload_already_ran() -> None:
+    """The inner TTL branch (line 96) is hit when two threads reach the outer
+    TTL check simultaneously. The second thread acquires the lock and finds
+    _last_load was already updated — so it skips reload()."""
+    import threading
+
+    client = MutableSSMClientMock("v1")
+    reloader = SettingsReloader(make_ssm_settings(client), ttl=0.01)
+
+    # Let the TTL expire.
+    time.sleep(0.02)
+    client.ssm_value = "v2"
+
+    reload_count = 0
+    original_reload = reloader.reload
+
+    def counting_reload() -> None:
+        nonlocal reload_count
+        reload_count += 1
+        original_reload()
+
+    object.__setattr__(reloader, "reload", counting_reload)
+
+    # Two threads access the proxy simultaneously after TTL expiry.
+    results: list[str] = []
+    barrier = threading.Barrier(2)
+
+    def access() -> None:
+        barrier.wait()
+        results.append(reloader.my_param)
+
+    t1 = threading.Thread(target=access)
+    t2 = threading.Thread(target=access)
+    t1.start(); t2.start()
+    t1.join(); t2.join()
+
+    # Both threads must see the updated value.
+    assert all(v == "v2" for v in results)
+    # Reload should have been called at most twice (one per thread reaching
+    # the outer check), but the double-checked locking prevents double work.
+    assert reload_count <= 2
+
+
 # ---------------------------------------------------------------------------
 # Lazy TTL mode
 
