@@ -67,6 +67,7 @@ That’s it, `boto3` will resolve your AWS credentials automatically using its s
 - Multi-region and multi-account support via per-field boto3 clients
 - Thread-safe client cache, compatible with free-threaded Python (3.13t, 3.14t)
 - Falls back to environment variables, dotenv, and secret files automatically
+- **Live reloading** — background or lazy TTL reload with per-field change events, so your app can react to secret rotations without restarting
 
 ## 🔧 Requirements
 
@@ -195,6 +196,56 @@ class MySettings(SecretsManagerBaseSettings):
     username: str
     password: str
 ```
+
+### 🔄 Live Reloading
+
+`SettingsReloader` is a transparent proxy that keeps your settings in sync with AWS as secrets rotate or parameters change — without restarting your application.
+
+```python
+import boto3
+from pydantic_settings_aws import (
+    AWSSettingsConfigDict,
+    ChangeEvent,
+    SecretsManagerBaseSettings,
+    SecretsManagerVersionChecker,
+    SettingsReloader,
+)
+
+
+class MySettings(SecretsManagerBaseSettings):
+    model_config = AWSSettingsConfigDict(secrets_name="myapp/db")
+    db_user: str
+    db_password: str
+
+
+# Only call GetSecretValue when the VersionId actually changes
+checker = SecretsManagerVersionChecker(
+    client=boto3.client("secretsmanager"),
+    secret_name="myapp/db",
+)
+
+reloader = SettingsReloader(MySettings, interval=60, version_checker=checker)
+
+
+@reloader.on_change("db_user", "db_password")
+def reconnect(changed: dict[str, ChangeEvent]) -> None:
+    recreate_db_connection(
+        user=changed["db_user"].new,
+        password=changed["db_password"].new,
+    )
+
+
+with reloader:
+    print(reloader.db_user)  # transparent proxy — works just like MySettings()
+```
+
+Three reload modes are supported:
+
+| Mode | Parameter | Use case |
+| :--- | :-------- | :------- |
+| Background thread | `interval=60` | Long-running services |
+| Lazy TTL | `ttl=300` | Lambda / serverless |
+| Manual | *(none)* | On SIGHUP or health check |
 
 ## 👩🏼‍⚖️ License
 

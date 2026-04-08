@@ -4,10 +4,10 @@ from typing import Annotated
 from pydantic import BaseModel
 
 from pydantic_settings_aws import (
+    SSM,
     AWSBaseSettings,
     AWSSettingsConfigDict,
     ParameterStoreBaseSettings,
-    SSM,
     Secrets,
     SecretsManagerBaseSettings,
 )

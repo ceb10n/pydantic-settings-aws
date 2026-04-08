@@ -11,6 +11,13 @@ from .errors import (
     SSMError,
 )
 from .fields import SSM, Secrets
+from .reload import (
+    ChangeEvent,
+    SecretsManagerVersionChecker,
+    SettingsReloader,
+    SSMVersionChecker,
+    VersionChecker,
+)
 from .settings import (
     AWSBaseSettings,
     ParameterStoreBaseSettings,
@@ -23,7 +30,11 @@ __all__ = [
     "AWSClientError",
     "AWSSettingsConfigDict",
     "AWSSettingsConfigError",
+    "ChangeEvent",
     "ParameterNotFoundError",
+    "SecretsManagerVersionChecker",
+    "SSMVersionChecker",
+    "VersionChecker",
     "ParameterStoreBaseSettings",
     "PydanticSettingsAWSError",
     "SecretContentError",
@@ -32,6 +43,7 @@ __all__ = [
     "Secrets",
     "SecretsManagerBaseSettings",
     "SecretsManagerError",
+    "SettingsReloader",
     "SSM",
     "SSMError",
 ]
