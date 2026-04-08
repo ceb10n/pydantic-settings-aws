@@ -29,3 +29,15 @@
 ::: pydantic_settings_aws.errors.AWSClientError
 
 ::: pydantic_settings_aws.errors.AWSSettingsConfigError
+
+## Live Reloading
+
+::: pydantic_settings_aws.reload.reloader.SettingsReloader
+
+::: pydantic_settings_aws.reload.events.ChangeEvent
+
+::: pydantic_settings_aws.reload.version_checkers.VersionChecker
+
+::: pydantic_settings_aws.reload.version_checkers.SecretsManagerVersionChecker
+
+::: pydantic_settings_aws.reload.version_checkers.SSMVersionChecker

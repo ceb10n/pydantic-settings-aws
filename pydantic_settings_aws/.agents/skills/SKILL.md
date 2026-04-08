@@ -158,6 +158,87 @@ class MySettings(AWSBaseSettings):
     log_level: str
 ```
 
+## Live Reloading
+
+`SettingsReloader` is a transparent proxy that reloads settings from AWS on a schedule or TTL and fires change events when field values change.
+
+### Import
+
+```python
+from pydantic_settings_aws import (
+    ChangeEvent,
+    SecretsManagerVersionChecker,
+    SettingsReloader,
+    SSMVersionChecker,
+    VersionChecker,
+)
+```
+
+### SettingsReloader
+
+```python
+SettingsReloader(
+    settings_cls,        # any settings class
+    *,
+    interval=None,       # float — background thread polls every N seconds
+    ttl=None,            # float — lazy reload after N seconds of staleness
+    version_checker=None # VersionChecker | None
+)
+```
+
+- `interval` and `ttl` are mutually exclusive. Omit both for manual-only reloading.
+- Acts as a transparent proxy: `reloader.my_field` forwards to the current inner instance.
+- `reload()` — re-fetch immediately.
+- `start()` / `stop()` — start/stop background thread (interval mode only).
+- Context manager (`with reloader`) — calls `start()` on enter, `stop()` on exit.
+
+### Change events
+
+```python
+@reloader.on_change("field1", "field2")
+def handle(changed: dict[str, ChangeEvent]) -> None:
+    # called once per reload with all registered fields that changed
+    old = changed["field1"].old
+    new = changed["field1"].new
+
+@reloader.on_change()  # no args = global listener, fires for any change
+def handle_all(changed: dict[str, ChangeEvent]) -> None:
+    ...
+```
+
+`ChangeEvent` has three attributes: `field: str`, `old: Any`, `new: Any`.
+
+### Version checkers
+
+Version checkers skip the full `settings_cls()` call when nothing changed in AWS. Pass one via `version_checker=`.
+
+**`SecretsManagerVersionChecker`** — calls `describe_secret` (no secret payload). Real API savings when polling frequently.
+
+```python
+checker = SecretsManagerVersionChecker(
+    client=boto3.client("secretsmanager"),
+    secret_name="myapp/db",
+)
+```
+
+**`SSMVersionChecker`** — calls `get_parameters` (batch, up to 10 per call) and compares `Parameter.Version` integers. Still makes an API call but skips instantiation and diffing.
+
+```python
+checker = SSMVersionChecker(
+    client=boto3.client("ssm"),
+    parameter_names=["/myapp/db/host", "/myapp/db/port"],
+)
+```
+
+**`VersionChecker`** — `runtime_checkable` Protocol. Any object with `has_changed() -> bool` satisfies it. First call should return `False`; return `True` on errors (conservative fallback).
+
+### Critical rules for live reloading
+
+- Never pass both `interval` and `ttl` — raises `ValueError`.
+- `start()` raises `RuntimeError` if not in interval mode.
+- If `settings_cls()` raises during reload, current values are kept and the exception is logged — the reloader never propagates reload errors to callers.
+- Callbacks that raise are caught and logged; remaining callbacks still run.
+
 ## Settings priority
 
 1. `__init__` arguments

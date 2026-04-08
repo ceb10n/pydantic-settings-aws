@@ -61,6 +61,9 @@ nav:
     - AWS: examples/aws.md
     - Parameter Store: examples/parameter-store.md
     - Secrets Manager: examples/secrets-manager.md
+  - Live Reloading:
+    - Overview: reload/index.md
+    - Version Checkers: reload/version-checkers.md
   - Reference: reference.md
 
 extra_css:
