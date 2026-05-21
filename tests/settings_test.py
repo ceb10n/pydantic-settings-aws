@@ -1,5 +1,17 @@
+import json
 import os
+from typing import Annotated
 
+from pydantic_settings_aws import (
+    AWSBaseSettings,
+    AWSSettingsConfigDict,
+    ParameterStoreBaseSettings,
+    SSM,
+    Secrets,
+    SecretsManagerBaseSettings,
+)
+
+from .boto3_mocks import ClientMock
 from .settings_mocks import (
     AWSWithNonDictMetadata,
     AWSWithParameterAndSecretsWithDefaultBoto3Client,
@@ -123,3 +135,85 @@ def test_aws_settings_with_typed_descriptors() -> None:
     assert my_config is not None
     assert my_config.username == dict_secrets_with_username_and_password["username"]
     assert my_config.host is not None
+
+
+def test_parameter_store_skips_field_already_in_current_state() -> None:
+    client = ClientMock(ssm_value="from-aws")
+
+    class S(ParameterStoreBaseSettings):
+        model_config = AWSSettingsConfigDict(ssm_client=client)
+        my_value: Annotated[str, SSM(name="my/parameter")] = "default"
+
+    cfg = S(my_value="from-init")
+    assert cfg.my_value == "from-init"
+    assert client.get_parameter_calls == 0
+
+
+def test_parameter_store_fetches_when_field_not_in_current_state() -> None:
+    client = ClientMock(ssm_value="from-aws")
+
+    class S(ParameterStoreBaseSettings):
+        model_config = AWSSettingsConfigDict(ssm_client=client)
+        my_value: Annotated[str, SSM(name="my/parameter")] = "default"
+
+    cfg = S()
+    assert cfg.my_value == "from-aws"
+    assert client.get_parameter_calls == 1
+
+
+def test_secrets_manager_skips_eager_fetch_when_all_fields_in_current_state() -> None:
+    client = ClientMock(
+        secret_string=json.dumps({"username": "from-aws", "password": "from-aws"})
+    )
+
+    class S(SecretsManagerBaseSettings):
+        model_config = AWSSettingsConfigDict(
+            secrets_name="my/secret", secrets_client=client
+        )
+        username: str
+        password: str
+
+    cfg = S(username="from-init", password="from-init")
+    assert cfg.username == "from-init"
+    assert cfg.password == "from-init"
+    assert client.get_secret_value_calls == 0
+
+
+def test_secrets_manager_fetches_once_when_any_field_missing() -> None:
+    client = ClientMock(
+        secret_string=json.dumps({"username": "from-aws", "password": "from-aws"})
+    )
+
+    class S(SecretsManagerBaseSettings):
+        model_config = AWSSettingsConfigDict(
+            secrets_name="my/secret", secrets_client=client
+        )
+        username: str
+        password: str
+
+    cfg = S(username="from-init")  # type: ignore[call-arg]
+    assert cfg.username == "from-init"
+    assert cfg.password == "from-aws"
+    assert client.get_secret_value_calls == 1
+
+
+def test_aws_source_skips_field_already_in_current_state() -> None:
+    ssm_client = ClientMock(ssm_value="from-aws")
+    secrets_client = ClientMock(
+        secret_string=json.dumps({"username": "from-aws"})
+    )
+
+    class S(AWSBaseSettings):
+        model_config = AWSSettingsConfigDict(
+            ssm_client=ssm_client,
+            secrets_client=secrets_client,
+            secrets_name="my/secret",
+        )
+        username: Annotated[str, Secrets(field="username")]
+        host: Annotated[str, SSM(name="my/host")]
+
+    cfg = S(username="from-init", host="from-init")
+    assert cfg.username == "from-init"
+    assert cfg.host == "from-init"
+    assert ssm_client.get_parameter_calls == 0
+    assert secrets_client.get_secret_value_calls == 0

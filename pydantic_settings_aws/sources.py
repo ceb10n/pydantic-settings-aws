@@ -82,6 +82,8 @@ class AWSSettingsSource(PydanticBaseSettingsSource):
         d: dict[str, Any] = {}
 
         for field_name, field in self.settings_cls.model_fields.items():
+            if field_name in self.current_state:
+                continue
             field_value, field_key, value_is_complex = self.get_field_value(
                 field, field_name
             )
@@ -124,6 +126,8 @@ class ParameterStoreSettingsSource(PydanticBaseSettingsSource):
         d: dict[str, Any] = {}
 
         for field_name, field in self.settings_cls.model_fields.items():
+            if field_name in self.current_state:
+                continue
             field_value, field_key, value_is_complex = self.get_field_value(
                 field, field_name
             )
@@ -139,14 +143,19 @@ class ParameterStoreSettingsSource(PydanticBaseSettingsSource):
 class SecretsManagerSettingsSource(PydanticBaseSettingsSource):
     def __init__(self, settings_cls: type[BaseSettings]):
         super().__init__(settings_cls)
-        self._json_content = aws.get_secrets_content(settings_cls)
+        self._json_content: dict[str, Any] | None = None
         log_py_version_deprecation_warning()
+
+    def _ensure_json_content(self) -> dict[str, Any]:
+        if self._json_content is None:
+            self._json_content = aws.get_secrets_content(self.settings_cls)
+        return self._json_content
 
     def get_field_value(
         self, field: FieldInfo, field_name: str
     ) -> tuple[Any, str, bool]:
         secret_key = utils.get_secrets_field_name(field.metadata, field_name)
-        field_value = self._json_content.get(secret_key)
+        field_value = self._ensure_json_content().get(secret_key)
         return field_value, field_name, False
 
     def prepare_field_value(
@@ -162,6 +171,8 @@ class SecretsManagerSettingsSource(PydanticBaseSettingsSource):
         d: dict[str, Any] = {}
 
         for field_name, field in self.settings_cls.model_fields.items():
+            if field_name in self.current_state:
+                continue
             field_value, field_key, value_is_complex = self.get_field_value(
                 field, field_name
             )

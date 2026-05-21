@@ -22,6 +22,8 @@ class ClientMock:
         self.secret_string = secret_string
         self.secret_bytes = secret_bytes
         self.ssm_value = ssm_value
+        self.get_parameter_calls = 0
+        self.get_secret_value_calls = 0
 
     def client(self, *args: Any) -> "ClientMock":
         return self
@@ -29,6 +31,7 @@ class ClientMock:
     def get_parameter(
         self, Name: str | None = None, WithDecryption: bool | None = None
     ) -> dict[str, Any]:
+        self.get_parameter_calls += 1
         return {"Parameter": {"Value": self.ssm_value}}
 
     def get_secret_value(
@@ -37,6 +40,7 @@ class ClientMock:
         VersionId: str | None = None,
         VersionStage: str | None = None,
     ) -> dict[str, Any]:
+        self.get_secret_value_calls += 1
         return {
             "ARN": "string",
             "Name": "string",
